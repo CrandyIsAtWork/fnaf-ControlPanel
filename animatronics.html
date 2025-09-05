@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animatronic Control Panel</title>
+    <style>
+        body { font-family: sans-serif; background-color: #1a1a1a; color: white; text-align: center; padding-top: 50px; }
+        h1 { color: #ff4500; }
+        button {
+            display: block;
+            margin: 20px auto;
+            padding: 15px 30px;
+            font-size: 18px;
+            cursor: pointer;
+            border: 2px solid #ff4500;
+            background-color: transparent;
+            color: #ff4500;
+            transition: all 0.3s;
+        }
+        button:hover {
+            background-color: #ff4500;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Animatronic Controls</h1>
+
+    <button id="popup-button">Trigger Jumpscare Pop-up</button>
+    <button id="ad-button">Activate Annoying Ad</button>
+
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
+    <script>
+        // --- IMPORTANT ---
+        // Make sure this URL matches your server's address.
+        // Use 'http://localhost:3000' if you're on the same computer.
+        // Use 'http://YOUR_LOCAL_IP:3000' if you're on the same WiFi.
+        const socket = io('https://8b503b84-132c-4149-bdb3-8bef57ec4fd8-00-2ga0ewjtdd2yk.worf.replit.dev');
+
+        // Find the buttons by their ID
+        const popupButton = document.getElementById('popup-button');
+        const adButton = document.getElementById('ad-button');
+
+        // Add a click event to the "Jumpscare" button
+        popupButton.addEventListener('click', () => {
+            console.log("Sending 'popup' event...");
+            // Send a message to the server with the type 'popup'
+            socket.emit('activate-event', { type: 'popup' });
+        });
+
+        // Add a click event to the "Ad" button
+        adButton.addEventListener('click', () => {
+            console.log("Sending 'ad' event...");
+            // Send a message to the server with the type 'ad'
+            socket.emit('activate-event', { type: 'ad' });
+        });
+    </script>
+
+</body>
+</html>
