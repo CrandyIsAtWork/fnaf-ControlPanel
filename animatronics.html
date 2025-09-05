@@ -2,25 +2,64 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Animatronic Control Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <style>
-        body { font-family: sans-serif; background-color: #1a1a1a; color: white; text-align: center; padding-top: 50px; }
-        h1 { color: #ff4500; }
+        /* CSS CHANGES FOR MOBILE */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'VT323', monospace;
+            background-color: #1a1a1a;
+            color: white;
+            text-align: center;
+            user-select: none;
+            /* New flexbox properties to center content */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        h1 {
+            color: #ff4500;
+            font-size: 3.5em; /* Slightly larger for impact */
+            text-shadow: 2px 2px #000;
+            margin-bottom: 30px;
+        }
+        .controls-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
         button {
-            display: block;
-            margin: 20px auto;
-            padding: 15px 30px;
-            font-size: 18px;
+            width: 90%; /* Buttons are wider on mobile */
+            max-width: 400px; /* But not too wide on desktop */
+            margin: 15px 0;
+            padding: 20px;
+            font-family: 'VT323', monospace;
+            font-size: 2em; /* Bigger font for easier tapping */
             cursor: pointer;
-            border: 2px solid #ff4500;
+            border: 3px solid #ff4500;
             background-color: transparent;
             color: #ff4500;
-            transition: all 0.3s;
+            transition: all 0.2s ease;
         }
         button:hover {
             background-color: #ff4500;
-            color: white;
+            color: #fff;
+            box-shadow: 0 0 15px #ff4500;
+        }
+        button:active {
+            transform: scale(0.95);
         }
     </style>
 </head>
@@ -28,36 +67,37 @@
 
     <h1>Animatronic Controls</h1>
 
-    <button id="popup-button">Trigger Jumpscare Pop-up</button>
-    <button id="ad-button">Activate Annoying Ad</button>
+    <div class="controls-container">
+        <button id="popup-button">Trigger Jumpscare</button>
+        <button id="ad-button">Activate Annoying Ad</button>
+    </div>
 
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
-
     <script>
-        // --- IMPORTANT ---
-        // Make sure this URL matches your server's address.
-        // Use 'http://localhost:3000' if you're on the same computer.
-        // Use 'http://YOUR_LOCAL_IP:3000' if you're on the same WiFi.
-        const socket = io('https://8b503b84-132c-4149-bdb3-8bef57ec4fd8-00-2ga0ewjtdd2yk.worf.replit.dev');
+        const socket = io('YOUR_REPLIT_SERVER_URL'); // Make sure this is your Replit URL!
 
-        // Find the buttons by their ID
         const popupButton = document.getElementById('popup-button');
         const adButton = document.getElementById('ad-button');
 
-        // Add a click event to the "Jumpscare" button
         popupButton.addEventListener('click', () => {
-            console.log("Sending 'popup' event...");
-            // Send a message to the server with the type 'popup'
+            console.log("Sending 'popup' event to server...");
             socket.emit('activate-event', { type: 'popup' });
         });
 
-        // Add a click event to the "Ad" button
         adButton.addEventListener('click', () => {
-            console.log("Sending 'ad' event...");
-            // Send a message to the server with the type 'ad'
+            console.log("Sending 'ad' event to server...");
             socket.emit('activate-event', { type: 'ad' });
+        });
+
+        socket.on('connect', () => {
+            console.log('Connected to the server with ID:', socket.id);
         });
     </script>
 
 </body>
+</html>
+    </script>
+
+</body>
+
 </html>
