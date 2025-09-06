@@ -83,8 +83,23 @@
 
         adButton.addEventListener('click', () => {
             socket.emit('activate-event', { type: 'ad' });
-            let cooldown = 10;
+            
+            // --- NEW: PROBABILITY-BASED COOLDOWN ---
+            let cooldown;
+            const random = Math.random(); // Get a random number between 0.0 and 1.0
+
+            if (random < 0.05) {         // 5% chance
+                cooldown = 5;
+            } else if (random < 0.15) {  // 10% chance
+                cooldown = 20;
+            } else if (random < 0.50) {  // 35% chance
+                cooldown = 30;
+            } else {                     // 50% chance
+                cooldown = 35;
+            }
+
             adButton.disabled = true;
+            
             const originalText = adButton.textContent;
             adButton.textContent = `On Cooldown (${cooldown}s)`;
             const interval = setInterval(() => {
@@ -129,4 +144,3 @@
     </script>
 </body>
 </html>
-
