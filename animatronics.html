@@ -49,37 +49,23 @@
         .sound-btn { border-color: #7a00ff; color: #7a00ff; }
         .sound-btn:hover:not(:disabled) { background-color: #7a00ff; color: #fff; }
 
-        /* --- NEW: MESSAGE LOG STYLES --- */
+        /* --- NEW: CHAT TOGGLE SWITCH STYLES --- */
+        .chat-mode { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 5px 0; color: #aaa; }
+        .switch { position: relative; display: inline-block; width: 50px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px; }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #7a00ff; }
+        input:checked + .slider:before { transform: translateX(26px); }
+
+        /* Message Log Styles */
         #message-log {
-            width: 90%;
-            max-width: 400px;
-            height: 120px;
-            background-color: #0a0a0a;
-            border: 3px solid #555;
-            margin-top: 20px;
-            padding: 10px;
-            list-style: none;
-            overflow-y: auto;
-            text-align: left;
-            font-size: 1.1em;
-            box-sizing: border-box;
+            width: 90%; max-width: 400px; height: 120px; background-color: #0a0a0a;
+            border: 3px solid #555; margin-top: 20px; padding: 10px; list-style: none;
+            overflow-y: auto; text-align: left; font-size: 1.1em; box-sizing: border-box;
         }
-        #message-log li {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 5px;
-            padding-bottom: 5px;
-            border-bottom: 1px dashed #333;
-            word-break: break-all;
-        }
-        .message-avatar {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            border: 2px solid #555;
-            flex-shrink: 0;
-        }
+        #message-log li { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; padding-bottom: 5px; border-bottom: 1px dashed #333; word-break: break-all; }
+        .message-avatar { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #555; flex-shrink: 0; }
     </style>
 </head>
 <body>
@@ -117,13 +103,22 @@
         <div class="controls-buttons">
             <button id="ad-button">Activate Annoying Ad</button>
             <input type="text" id="message-input" placeholder="Type a message..." maxlength="50">
+            
+            <div class="chat-mode">
+                <span>Public</span>
+                <label class="switch">
+                    <input type="checkbox" id="chat-mode-toggle">
+                    <span class="slider"></span>
+                </label>
+                <span>Private</span>
+            </div>
+
             <button id="send-button">Send Message</button>
             <button class="sound-btn" data-sound="laugh">Freddy's Laugh</button>
             <button class="sound-btn" data-sound="beatbox">Freddy Beatbox</button>
             <button class="sound-btn" data-sound="glitch">Golden Freddy</button>
             <button class="sound-btn" data-sound="scream">Scream</button>
         </div>
-
         <ul id="message-log" class="hidden"></ul>
     </div>
 
@@ -144,7 +139,8 @@
         const messageInput = document.getElementById('message-input');
         const sendButton = document.getElementById('send-button');
         const soundButtons = document.querySelectorAll('.sound-btn');
-        const messageLog = document.getElementById('message-log'); // NEW
+        const messageLog = document.getElementById('message-log');
+        const chatModeToggle = document.getElementById('chat-mode-toggle'); // NEW
 
         let selectedColor = null;
         let selectedAvatar = null;
@@ -206,10 +202,16 @@
             }, 1000);
         });
 
+        // UPDATED: Send Button Logic
         sendButton.addEventListener('click', () => {
             const message = messageInput.value.trim();
             if (message) {
-                socket.emit('send-message', { message: message });
+                const isPrivate = chatModeToggle.checked;
+                if (isPrivate) {
+                    socket.emit('send-private-message', { message: message });
+                } else {
+                    socket.emit('send-message', { message: message });
+                }
                 messageInput.value = '';
             }
         });
@@ -236,7 +238,6 @@
             console.log('Successfully connected to the server!');
         });
         
-        // --- NEW: MESSAGE RECEIVING LOGIC ---
         socket.on('receive-message', (data) => {
             const { message, sender } = data;
             
