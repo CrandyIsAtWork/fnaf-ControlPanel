@@ -8,48 +8,25 @@
     <style>
         /* General Body Styles */
         html, body { height: 100%; margin: 0; padding: 0; }
-        body {
-            font-family: 'VT323', monospace;
-            background-color: #1a1a1a;
-            color: white;
-            text-align: center;
-            user-select: none;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            padding: 10px; box-sizing: border-box;
-        }
+        body { font-family: 'VT323', monospace; background-color: #1a1a1a; color: white; text-align: center; user-select: none; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px; box-sizing: border-box; }
         .container { display: flex; flex-direction: column; align-items: center; width: 100%; }
         h1 { color: #ff4500; font-size: 2.5em; text-shadow: 2px 2px #000; margin: 0 0 15px 0; }
         h2 { color: #ccc; font-size: 1.5em; margin: 15px 0 5px 0; }
         .hidden { display: none; }
-
-        /* Input and Button Styles */
-        input[type="text"] {
-            font-family: 'VT323', monospace; font-size: 1.5em; width: 90%; max-width: 400px;
-            padding: 10px; margin-bottom: 10px; background-color: #0a0a0a;
-            border: 3px solid #555; color: white; text-align: center;
-        }
-        button {
-            width: 90%; max-width: 400px; margin: 8px 0; padding: 15px;
-            font-family: 'VT323', monospace; font-size: 1.8em; cursor: pointer;
-            border: 3px solid #ff4500; background-color: transparent; color: #ff4500;
-            transition: all 0.2s ease;
-        }
+        input[type="text"] { font-family: 'VT323', monospace; font-size: 1.5em; width: 90%; max-width: 400px; padding: 10px; margin-bottom: 10px; background-color: #0a0a0a; border: 3px solid #555; color: white; text-align: center; }
+        button { width: 90%; max-width: 400px; margin: 8px 0; padding: 15px; font-family: 'VT323', monospace; font-size: 1.8em; cursor: pointer; border: 3px solid #ff4500; background-color: transparent; color: #ff4500; transition: all 0.2s ease; }
         button:hover:not(:disabled) { background-color: #ff4500; color: #fff; }
         button:disabled { border-color: #555; color: #555; cursor: not-allowed; }
-
-        /* Selection Styles */
         .selection-group { display: flex; justify-content: center; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; }
         .color-swatch { width: 40px; height: 40px; cursor: pointer; border: 4px solid #444; transition: border-color 0.2s; }
         .color-swatch.selected { border-color: #fff; }
         .avatar-select { width: 60px; height: 60px; cursor: pointer; border: 4px solid #444; transition: border-color 0.2s; }
         .avatar-select.selected { border-color: #fff; }
-        
-        /* Control Screen Button Styles */
         .controls-buttons { display: flex; flex-direction: column; align-items: center; width: 100%; }
         .sound-btn { border-color: #7a00ff; color: #7a00ff; }
         .sound-btn:hover:not(:disabled) { background-color: #7a00ff; color: #fff; }
-
-        /* Chat Toggle Switch Styles */
+        .ability-btn { border-color: #ff00de; color: #ff00de; }
+        .ability-btn:hover:not(:disabled) { background-color: #ff00de; color: #fff; }
         .chat-mode { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 5px 0; color: #aaa; }
         .switch { position: relative; display: inline-block; width: 50px; height: 24px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -57,13 +34,7 @@
         .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: #7a00ff; }
         input:checked + .slider:before { transform: translateX(26px); }
-
-        /* Message Log Styles */
-        #message-log {
-            width: 90%; max-width: 400px; height: 120px; background-color: #0a0a0a;
-            border: 3px solid #555; margin-top: 20px; padding: 10px; list-style: none;
-            overflow-y: auto; text-align: left; font-size: 1.1em; box-sizing: border-box;
-        }
+        #message-log { width: 90%; max-width: 400px; height: 120px; background-color: #0a0a0a; border: 3px solid #555; margin-top: 20px; padding: 10px; list-style: none; overflow-y: auto; text-align: left; font-size: 1.1em; box-sizing: border-box; }
         #message-log li { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; padding-bottom: 5px; border-bottom: 1px dashed #333; word-break: break-all; }
         .message-avatar { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #555; flex-shrink: 0; }
     </style>
@@ -72,9 +43,7 @@
 
     <div id="join-screen" class="container">
         <h1>Animatronic Setup</h1>
-        
         <input type="text" id="player-name-input" placeholder="Enter Your Name" maxlength="12">
-        
         <h2>Choose Your Color</h2>
         <div class="selection-group" id="color-selector">
             <div class="color-swatch" data-color="#ff4136" style="background-color:#ff4136;"></div>
@@ -83,7 +52,6 @@
             <div class="color-swatch" data-color="#ffdc00" style="background-color:#ffdc00;"></div>
             <div class="color-swatch" data-color="#b10dc9" style="background-color:#b10dc9;"></div>
         </div>
-
         <h2>Choose Your Avatar</h2>
         <div class="selection-group" id="avatar-selector">
             <img class="avatar-select" src="https://crandyisatwork.github.io/fnaf-terminal/avatars/avatar1.jpg" data-avatar="avatars/avatar1.jpg">
@@ -93,7 +61,6 @@
             <img class="avatar-select" src="https://crandyisatwork.github.io/fnaf-terminal/avatars/avatar5.jpg" data-avatar="avatars/avatar5.jpg">
             <img class="avatar-select" src="https://crandyisatwork.github.io/fnaf-terminal/avatars/avatar6.jpg" data-avatar="avatars/avatar6.jpg">
         </div>
-        
         <input type="text" id="room-code-input" placeholder="Enter Room Code" maxlength="4">
         <button id="join-button">Join Game</button>
     </div>
@@ -102,17 +69,14 @@
         <h1 id="room-title">Room: ABCD</h1>
         <div class="controls-buttons">
             <button id="ad-button">Activate Annoying Ad</button>
+            <button id="sabotage-button" class="ability-btn">Sabotage Task (60s)</button>
+            <button id="glitch-button" class="ability-btn">System Glitch (45s)</button>
             <input type="text" id="message-input" placeholder="Type a message..." maxlength="50">
-            
             <div class="chat-mode">
                 <span>Public</span>
-                <label class="switch">
-                    <input type="checkbox" id="chat-mode-toggle">
-                    <span class="slider"></span>
-                </label>
+                <label class="switch"><input type="checkbox" id="chat-mode-toggle"><span class="slider"></span></label>
                 <span>Private</span>
             </div>
-
             <button id="send-button">Send Message</button>
             <button class="sound-btn" data-sound="laugh">Freddy's Laugh</button>
             <button class="sound-btn" data-sound="beatbox">Freddy Beatbox</button>
@@ -136,6 +100,8 @@
         const joinButton = document.getElementById('join-button');
         const roomTitle = document.getElementById('room-title');
         const adButton = document.getElementById('ad-button');
+        const sabotageButton = document.getElementById('sabotage-button');
+        const glitchButton = document.getElementById('glitch-button');
         const messageInput = document.getElementById('message-input');
         const sendButton = document.getElementById('send-button');
         const soundButtons = document.querySelectorAll('.sound-btn');
@@ -144,6 +110,7 @@
 
         let selectedColor = null;
         let selectedAvatar = null;
+        let sabotageInterval;
 
         // --- Selection Logic ---
         colorSelector.addEventListener('click', (e) => {
@@ -198,6 +165,26 @@
                     clearInterval(interval);
                     adButton.disabled = false;
                     adButton.textContent = originalText;
+                }
+            }, 1000);
+        });
+
+        sabotageButton.addEventListener('click', () => {
+            socket.emit('sabotage-task');
+        });
+
+        glitchButton.addEventListener('click', () => {
+            socket.emit('system-glitch');
+            glitchButton.disabled = true;
+            let cooldown = 45;
+            glitchButton.textContent = `System Glitch (${cooldown}s)`;
+            const interval = setInterval(() => {
+                cooldown--;
+                glitchButton.textContent = `System Glitch (${cooldown}s)`;
+                if (cooldown <= 0) {
+                    clearInterval(interval);
+                    glitchButton.disabled = false;
+                    glitchButton.textContent = 'System Glitch (45s)';
                 }
             }, 1000);
         });
@@ -262,6 +249,26 @@
                 messageLog.removeChild(messageLog.firstChild);
             }
             messageLog.scrollTop = messageLog.scrollHeight;
+        });
+
+        socket.on('start-sabotage-cooldown', () => {
+            sabotageButton.disabled = true;
+            let cooldown = 60;
+            sabotageButton.textContent = `Sabotage Task (${cooldown}s)`;
+            clearInterval(sabotageInterval);
+            sabotageInterval = setInterval(() => {
+                cooldown--;
+                sabotageButton.textContent = `Sabotage Task (${cooldown}s)`;
+                if (cooldown <= 0) {
+                    clearInterval(sabotageInterval);
+                }
+            }, 1000);
+        });
+
+        socket.on('sabotage-ready', () => {
+            clearInterval(sabotageInterval);
+            sabotageButton.disabled = false;
+            sabotageButton.textContent = 'Sabotage Task (60s)';
         });
     </script>
 </body>
