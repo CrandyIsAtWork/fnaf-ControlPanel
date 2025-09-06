@@ -6,11 +6,7 @@
     <title>Animatronic Control Panel</title>
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <style>
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-        }
+        html, body { height: 100%; margin: 0; padding: 0; }
         body {
             font-family: 'VT323', monospace;
             background-color: #1a1a1a;
@@ -24,35 +20,24 @@
             padding: 10px;
             box-sizing: border-box;
         }
-        h1 {
-            color: #ff4500;
-            font-size: 3em;
-            text-shadow: 2px 2px #000;
-            margin-bottom: 30px;
-        }
-        .container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-        }
+        h1 { color: #ff4500; font-size: 3em; text-shadow: 2px 2px #000; margin-bottom: 20px; }
+        .container { display: flex; flex-direction: column; align-items: center; width: 100%; }
         input[type="text"] {
             font-family: 'VT323', monospace;
-            font-size: 2em;
+            font-size: 1.5em; /* Sized for messages */
             width: 90%;
-            max-width: 300px;
+            max-width: 400px;
             padding: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             background-color: #0a0a0a;
             border: 3px solid #555;
             color: white;
             text-align: center;
-            text-transform: uppercase;
         }
         button {
             width: 90%;
             max-width: 400px;
-            margin: 15px 0;
+            margin: 10px 0;
             padding: 20px;
             font-family: 'VT323', monospace;
             font-size: 2em;
@@ -62,13 +47,13 @@
             color: #ff4500;
             transition: all 0.2s ease;
         }
-        button:hover {
-            background-color: #ff4500;
-            color: #fff;
+        button:hover:not(:disabled) { background-color: #ff4500; color: #fff; }
+        button:disabled {
+            border-color: #555;
+            color: #555;
+            cursor: not-allowed;
         }
-        .hidden {
-            display: none;
-        }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
@@ -81,59 +66,78 @@
 
     <div id="controls-screen" class="container hidden">
         <h1 id="room-title">Room: ABCD</h1>
-        <button id="popup-button">Trigger Jumpscare</button>
+        
         <button id="ad-button">Activate Annoying Ad</button>
+
+        <input type="text" id="message-input" placeholder="Type a message..." maxlength="50">
+        <button id="send-button">Send Message</button>
     </div>
 
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script>
-        // This is your specific server URL.
         const socket = io('https://8b503b84-132c-4149-bdb3-8bef57ec4fd8-00-2ga0ewjtdd2yk.worf.replit.dev');
 
-        // --- Get all the elements from the HTML ---
         const joinScreen = document.getElementById('join-screen');
         const controlsScreen = document.getElementById('controls-screen');
         const roomCodeInput = document.getElementById('room-code-input');
         const joinButton = document.getElementById('join-button');
         const roomTitle = document.getElementById('room-title');
-        const popupButton = document.getElementById('popup-button');
+        
+        // --- Updated element selectors ---
         const adButton = document.getElementById('ad-button');
+        const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-button');
 
-        // --- Logic for joining a game ---
         joinButton.addEventListener('click', () => {
             const roomCode = roomCodeInput.value.trim().toUpperCase();
             if (roomCode) {
-                // This will be our new event for joining a room
                 socket.emit('join-game', { roomCode: roomCode });
             }
         });
 
-        // --- Logic for the control buttons ---
-        popupButton.addEventListener('click', () => {
-            socket.emit('activate-event', { type: 'popup' });
-        });
-
         adButton.addEventListener('click', () => {
             socket.emit('activate-event', { type: 'ad' });
+            
+            // --- NEW: Cooldown Logic ---
+            let cooldown = 45; // 45 seconds
+            adButton.disabled = true;
+            
+            const originalText = adButton.textContent;
+            adButton.textContent = `On Cooldown (${cooldown}s)`;
+
+            const interval = setInterval(() => {
+                cooldown--;
+                adButton.textContent = `On Cooldown (${cooldown}s)`;
+                if (cooldown <= 0) {
+                    clearInterval(interval);
+                    adButton.disabled = false;
+                    adButton.textContent = originalText;
+                }
+            }, 1000);
         });
 
-        // --- Listen for messages from the server ---
+        // --- NEW: Send Message Logic ---
+        sendButton.addEventListener('click', () => {
+            const message = messageInput.value.trim();
+            if (message) {
+                socket.emit('send-message', { message: message });
+                messageInput.value = ''; // Clear the input after sending
+            }
+        });
+        
         socket.on('join-successful', (data) => {
-            // Server confirms we joined, so switch screens
             roomTitle.textContent = `Room: ${data.roomCode}`;
             joinScreen.classList.add('hidden');
             controlsScreen.classList.remove('hidden');
         });
         
         socket.on('invalid-room', () => {
-            // Server tells us the room code was wrong
             alert('Invalid Room Code. Please try again.');
         });
 
         socket.on('connect', () => {
             console.log('Successfully connected to the server!');
         });
-
     </script>
 </body>
 </html>
