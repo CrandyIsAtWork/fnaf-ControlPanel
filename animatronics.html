@@ -49,7 +49,7 @@
         .sound-btn { border-color: #7a00ff; color: #7a00ff; }
         .sound-btn:hover:not(:disabled) { background-color: #7a00ff; color: #fff; }
 
-        /* --- NEW: CHAT TOGGLE SWITCH STYLES --- */
+        /* Chat Toggle Switch Styles */
         .chat-mode { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 5px 0; color: #aaa; }
         .switch { position: relative; display: inline-block; width: 50px; height: 24px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -140,7 +140,7 @@
         const sendButton = document.getElementById('send-button');
         const soundButtons = document.querySelectorAll('.sound-btn');
         const messageLog = document.getElementById('message-log');
-        const chatModeToggle = document.getElementById('chat-mode-toggle'); // NEW
+        const chatModeToggle = document.getElementById('chat-mode-toggle');
 
         let selectedColor = null;
         let selectedAvatar = null;
@@ -202,7 +202,6 @@
             }, 1000);
         });
 
-        // UPDATED: Send Button Logic
         sendButton.addEventListener('click', () => {
             const message = messageInput.value.trim();
             if (message) {
@@ -264,50 +263,6 @@
             }
             messageLog.scrollTop = messageLog.scrollHeight;
         });
-        // --- JOIN GAME ---
-joinButton.addEventListener('click', () => {
-    const roomCode = roomCodeInput.value.trim().toUpperCase();
-    const playerName = playerNameInput.value.trim();
-
-    if (!roomCode || !playerName || !selectedColor || !selectedAvatar) {
-        alert('Enter name, color, avatar, and room code.');
-        return;
-    }
-
-    socket.emit('join-game', {
-        roomCode,
-        name: playerName,
-        color: selectedColor,
-        avatar: selectedAvatar
-    });
-
-    roomTitle.textContent = `Room: ${roomCode}`;
-    joinScreen.classList.add('hidden');
-    controlsScreen.classList.remove('hidden');
-});
-
-// --- SEND MESSAGE ---
-sendButton.addEventListener('click', () => {
-    const message = messageInput.value.trim();
-    if (!message) return;
-
-    const isPrivate = chatModeToggle.checked; // false = public, true = private
-
-    socket.emit('send-message', {
-        message,
-        roomCode: roomCodeInput.value.trim().toUpperCase(),
-        isPrivate
-    });
-
-    messageInput.value = '';
-});
-
-// OPTIONAL: allow Enter key to send
-messageInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        sendButton.click();
-    }
-});
     </script>
 </body>
 </html>
