@@ -37,7 +37,7 @@
         button:hover:not(:disabled) { background-color: #ff4500; color: #fff; }
         button:disabled { border-color: #555; color: #555; cursor: not-allowed; }
 
-        /* UPDATED: Selection Styles with wrapping */
+        /* Selection Styles */
         .selection-group { display: flex; justify-content: center; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; }
         .color-swatch { width: 40px; height: 40px; cursor: pointer; border: 4px solid #444; transition: border-color 0.2s; }
         .color-swatch.selected { border-color: #fff; }
@@ -48,6 +48,38 @@
         .controls-buttons { display: flex; flex-direction: column; align-items: center; width: 100%; }
         .sound-btn { border-color: #7a00ff; color: #7a00ff; }
         .sound-btn:hover:not(:disabled) { background-color: #7a00ff; color: #fff; }
+
+        /* --- NEW: MESSAGE LOG STYLES --- */
+        #message-log {
+            width: 90%;
+            max-width: 400px;
+            height: 120px;
+            background-color: #0a0a0a;
+            border: 3px solid #555;
+            margin-top: 20px;
+            padding: 10px;
+            list-style: none;
+            overflow-y: auto;
+            text-align: left;
+            font-size: 1.1em;
+            box-sizing: border-box;
+        }
+        #message-log li {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 5px;
+            padding-bottom: 5px;
+            border-bottom: 1px dashed #333;
+            word-break: break-all;
+        }
+        .message-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 2px solid #555;
+            flex-shrink: 0;
+        }
     </style>
 </head>
 <body>
@@ -91,6 +123,8 @@
             <button class="sound-btn" data-sound="glitch">Golden Freddy</button>
             <button class="sound-btn" data-sound="scream">Scream</button>
         </div>
+
+        <ul id="message-log" class="hidden"></ul>
     </div>
 
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
@@ -110,6 +144,7 @@
         const messageInput = document.getElementById('message-input');
         const sendButton = document.getElementById('send-button');
         const soundButtons = document.querySelectorAll('.sound-btn');
+        const messageLog = document.getElementById('message-log'); // NEW
 
         let selectedColor = null;
         let selectedAvatar = null;
@@ -186,6 +221,7 @@
             });
         });
         
+        // --- Socket Listeners ---
         socket.on('join-successful', (data) => {
             roomTitle.textContent = `Room: ${data.roomCode}`;
             joinScreen.classList.add('hidden');
@@ -198,6 +234,34 @@
 
         socket.on('connect', () => {
             console.log('Successfully connected to the server!');
+        });
+        
+        // --- NEW: MESSAGE RECEIVING LOGIC ---
+        socket.on('receive-message', (data) => {
+            const { message, sender } = data;
+            
+            messageLog.classList.remove('hidden');
+            const messageItem = document.createElement('li');
+            const avatarImg = document.createElement('img');
+            const textContainer = document.createElement('div');
+            const senderName = document.createElement('strong');
+
+            avatarImg.classList.add('message-avatar');
+            avatarImg.src = `https://crandyisatwork.github.io/fnaf-terminal/${sender.avatar}`;
+
+            senderName.textContent = `${sender.name}: `;
+            senderName.style.color = sender.color;
+            textContainer.appendChild(senderName);
+            textContainer.appendChild(document.createTextNode(message));
+            
+            messageItem.appendChild(avatarImg);
+            messageItem.appendChild(textContainer);
+            messageLog.appendChild(messageItem);
+
+            if (messageLog.children.length > 5) {
+                messageLog.removeChild(messageLog.firstChild);
+            }
+            messageLog.scrollTop = messageLog.scrollHeight;
         });
     </script>
 </body>
