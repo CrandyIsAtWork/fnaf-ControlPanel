@@ -13,46 +13,29 @@
             color: white;
             text-align: center;
             user-select: none;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 10px;
-            box-sizing: border-box;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            padding: 10px; box-sizing: border-box;
         }
-        h1 { color: #ff4500; font-size: 3em; text-shadow: 2px 2px #000; margin-bottom: 20px; }
+        h1 { color: #ff4500; font-size: 2.5em; text-shadow: 2px 2px #000; margin-bottom: 15px; }
         .container { display: flex; flex-direction: column; align-items: center; width: 100%; }
         input[type="text"] {
-            font-family: 'VT323', monospace;
-            font-size: 1.5em; /* Sized for messages */
-            width: 90%;
-            max-width: 400px;
-            padding: 10px;
-            margin-bottom: 10px;
-            background-color: #0a0a0a;
-            border: 3px solid #555;
-            color: white;
-            text-align: center;
+            font-family: 'VT323', monospace; font-size: 1.5em; width: 90%; max-width: 400px;
+            padding: 10px; margin-bottom: 10px; background-color: #0a0a0a;
+            border: 3px solid #555; color: white; text-align: center;
         }
         button {
-            width: 90%;
-            max-width: 400px;
-            margin: 10px 0;
-            padding: 20px;
-            font-family: 'VT323', monospace;
-            font-size: 2em;
-            cursor: pointer;
-            border: 3px solid #ff4500;
-            background-color: transparent;
-            color: #ff4500;
+            width: 90%; max-width: 400px; margin: 8px 0; padding: 15px;
+            font-family: 'VT323', monospace; font-size: 1.8em; cursor: pointer;
+            border: 3px solid #ff4500; background-color: transparent; color: #ff4500;
             transition: all 0.2s ease;
         }
-        button:hover:not(:disabled) { background-color: #ff4500; color: #fff; }
-        button:disabled {
-            border-color: #555;
-            color: #555;
-            cursor: not-allowed;
+        .sound-btn {
+            border-color: #7a00ff;
+            color: #7a00ff;
         }
+        button:hover:not(:disabled) { background-color: #ff4500; color: #fff; }
+        .sound-btn:hover:not(:disabled) { background-color: #7a00ff; color: #fff; }
+        button:disabled { border-color: #555; color: #555; cursor: not-allowed; }
         .hidden { display: none; }
     </style>
 </head>
@@ -68,9 +51,13 @@
         <h1 id="room-title">Room: ABCD</h1>
         
         <button id="ad-button">Activate Annoying Ad</button>
-
         <input type="text" id="message-input" placeholder="Type a message..." maxlength="50">
         <button id="send-button">Send Message</button>
+
+        <button class="sound-btn" data-sound="laugh">Freddy's Laugh</button>
+        <button class="sound-btn" data-sound="beatbox">Freddy Beatbox</button>
+        <button class="sound-btn" data-sound="glitch">Golden Freddy</button>
+        <button class="sound-btn" data-sound="scream">Scream</button>
     </div>
 
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
@@ -82,11 +69,10 @@
         const roomCodeInput = document.getElementById('room-code-input');
         const joinButton = document.getElementById('join-button');
         const roomTitle = document.getElementById('room-title');
-        
-        // --- Updated element selectors ---
         const adButton = document.getElementById('ad-button');
         const messageInput = document.getElementById('message-input');
         const sendButton = document.getElementById('send-button');
+        const soundButtons = document.querySelectorAll('.sound-btn');
 
         joinButton.addEventListener('click', () => {
             const roomCode = roomCodeInput.value.trim().toUpperCase();
@@ -97,14 +83,10 @@
 
         adButton.addEventListener('click', () => {
             socket.emit('activate-event', { type: 'ad' });
-            
-            // --- NEW: Cooldown Logic ---
-            let cooldown = 45; // 45 seconds
+            let cooldown = 45;
             adButton.disabled = true;
-            
             const originalText = adButton.textContent;
             adButton.textContent = `On Cooldown (${cooldown}s)`;
-
             const interval = setInterval(() => {
                 cooldown--;
                 adButton.textContent = `On Cooldown (${cooldown}s)`;
@@ -116,13 +98,19 @@
             }, 1000);
         });
 
-        // --- NEW: Send Message Logic ---
         sendButton.addEventListener('click', () => {
             const message = messageInput.value.trim();
             if (message) {
                 socket.emit('send-message', { message: message });
-                messageInput.value = ''; // Clear the input after sending
+                messageInput.value = '';
             }
+        });
+
+        soundButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const soundName = button.dataset.sound;
+                socket.emit('play-sound', { soundName: soundName });
+            });
         });
         
         socket.on('join-successful', (data) => {
