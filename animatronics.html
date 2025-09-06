@@ -1,139 +1,134 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Animatronic Control</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #111;
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      min-height: 100vh;
-      padding: 20px;
-    }
-    input, button {
-      padding: 10px;
-      margin: 5px;
-      border-radius: 5px;
-      border: none;
-    }
-    button {
-      cursor: pointer;
-    }
-    #gameArea {
-      width: 600px;
-      height: 400px;
-      background-color: #222;
-      margin-top: 20px;
-      position: relative;
-      overflow: hidden;
-      border: 2px solid #555;
-    }
-    .animatronic {
-      width: 40px;
-      height: 40px;
-      background-color: red;
-      position: absolute;
-      top: 0;
-      left: 0;
-      border-radius: 5px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FNAF Animatronic</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #111;
+            color: #eee;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        #connect-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: none;
+            width: 150px;
+            text-align: center;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: none;
+            background-color: #ff3b3b;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #ff0000;
+        }
+
+        #status {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #aaa;
+        }
+
+        #animatronic-display {
+            width: 300px;
+            height: 300px;
+            background-color: #222;
+            border: 2px solid #555;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            border-radius: 10px;
+        }
+    </style>
 </head>
 <body>
-  <h1>Animatronic Control</h1>
-  
-  <div>
-    <input type="text" id="roomCode" placeholder="Room Code">
-    <button id="joinBtn">Join Room</button>
-  </div>
 
-  <div id="status"></div>
+    <div id="connect-container">
+        <input type="text" id="roomCode" placeholder="Enter Room Code" maxlength="6">
+        <button id="connectBtn">Connect</button>
+        <div id="status">Disconnected</div>
+    </div>
 
-  <div id="gameArea"></div>
+    <div id="animatronic-display">Waiting...</div>
 
-  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-  <script>
-    const socket = io("http://localhost:3000"); // adjust if using a different host
-    const joinBtn = document.getElementById("joinBtn");
-    const roomCodeInput = document.getElementById("roomCode");
-    const statusDiv = document.getElementById("status");
-    const gameArea = document.getElementById("gameArea");
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
 
-    let roomCode = null;
-    let animatronicId = null;
-    let animDiv = null;
+        const roomInput = document.getElementById('roomCode');
+        const connectBtn = document.getElementById('connectBtn');
+        const statusDiv = document.getElementById('status');
+        const displayDiv = document.getElementById('animatronic-display');
 
-    joinBtn.addEventListener("click", () => {
-      roomCode = roomCodeInput.value.trim();
-      if (!roomCode) return alert("Enter a room code");
+        let connected = false;
 
-      socket.emit("join-room", { roomCode, role: "animatronic" });
-    });
+        connectBtn.addEventListener('click', () => {
+            const roomCode = roomInput.value.trim();
+            if (!roomCode) {
+                alert("Please enter a room code.");
+                return;
+            }
+            socket.emit('joinRoom', { roomCode });
+        });
 
-    // --- SOCKET EVENTS ---
-    socket.on("room-error", (msg) => {
-      statusDiv.textContent = "Error: " + msg;
-    });
+        socket.on('joinedRoom', (data) => {
+            connected = true;
+            statusDiv.textContent = `Connected to room ${data.roomCode}`;
+        });
 
-    socket.on("room-joined", (data) => {
-      statusDiv.textContent = `Joined room ${data.roomCode} as Animatronic`;
-      animatronicId = socket.id;
+        socket.on('errorMessage', (msg) => {
+            statusDiv.textContent = `Error: ${msg}`;
+        });
 
-      // create animatronic div
-      animDiv = document.createElement("div");
-      animDiv.classList.add("animatronic");
-      animDiv.textContent = "A";
-      animDiv.style.top = "0px";
-      animDiv.style.left = "0px";
-      gameArea.appendChild(animDiv);
-    });
+        // Handle animatronic instructions from server
+        socket.on('animatronicAction', (action) => {
+            switch(action.type) {
+                case 'move':
+                    displayDiv.textContent = `Moving: ${action.direction}`;
+                    break;
+                case 'jumpscare':
+                    displayDiv.textContent = "!!! JUMPSCARE !!!";
+                    break;
+                case 'idle':
+                    displayDiv.textContent = "Idle";
+                    break;
+                default:
+                    displayDiv.textContent = "Unknown action";
+            }
+        });
 
-    socket.on("anim-move", ({ animId, position }) => {
-      if (animId === animatronicId) return; // skip self
-      let otherAnim = document.getElementById(animId);
-      if (!otherAnim) {
-        otherAnim = document.createElement("div");
-        otherAnim.classList.add("animatronic");
-        otherAnim.textContent = "O";
-        otherAnim.id = animId;
-        gameArea.appendChild(otherAnim);
-      }
-      otherAnim.style.left = position.x + "px";
-      otherAnim.style.top = position.y + "px";
-    });
+        socket.on('disconnect', () => {
+            connected = false;
+            statusDiv.textContent = "Disconnected";
+            displayDiv.textContent = "Waiting...";
+        });
+    </script>
 
-    // --- KEY CONTROLS ---
-    const speed = 10;
-    document.addEventListener("keydown", (e) => {
-      if (!animDiv) return;
-      let x = parseInt(animDiv.style.left);
-      let y = parseInt(animDiv.style.top);
-
-      if (e.key === "ArrowUp") y -= speed;
-      if (e.key === "ArrowDown") y += speed;
-      if (e.key === "ArrowLeft") x -= speed;
-      if (e.key === "ArrowRight") x += speed;
-
-      // keep inside game area
-      x = Math.max(0, Math.min(gameArea.clientWidth - 40, x));
-      y = Math.max(0, Math.min(gameArea.clientHeight - 40, y));
-
-      animDiv.style.left = x + "px";
-      animDiv.style.top = y + "px";
-
-      // send position to server
-      socket.emit("animatronic-move", { roomCode, animId: animatronicId, position: { x, y } });
-    });
-  </script>
 </body>
 </html>
