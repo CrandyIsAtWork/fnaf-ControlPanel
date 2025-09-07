@@ -6,6 +6,7 @@
     <title>Animatronic Control Panel</title>
     <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
     <style>
+        /* General Body Styles */
         html, body { height: 100%; margin: 0; padding: 0; }
         body { font-family: 'VT323', monospace; background-color: #1a1a1a; color: white; text-align: center; user-select: none; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px; box-sizing: border-box; }
         .container { display: flex; flex-direction: column; align-items: center; width: 100%; }
@@ -37,13 +38,23 @@
         #message-log li { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; padding-bottom: 5px; border-bottom: 1px dashed #333; word-break: break-all; }
         .message-avatar { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #555; flex-shrink: 0; }
         
-        /* FADE & SWITCH AVATAR SCREEN STYLES */
-        #avatar-screen { width: 100%; max-width: 500px; }
-        #avatar-name-display { font-size: 2.5em; color: #ffdc00; height: 40px; margin-bottom: 15px; }
-        #avatar-display-wrapper { display: flex; align-items: center; justify-content: space-around; width: 100%; }
-        #main-avatar-display { width: 80vw; height: 80vw; max-width: 350px; max-height: 350px; border: 5px solid #ffdc00; object-fit: cover; transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out; opacity: 1; transform: scale(1); }
-        #main-avatar-display.loading { opacity: 0; transform: scale(0.95); }
-        .nav-button { font-size: 4em; border: none; background: none; color: #fff; padding: 0 10px; z-index: 10; }
+        /* RESPONSIVE AVATAR CAROUSEL STYLES */
+        #avatar-screen { width: 100%; }
+        #avatar-name-display { font-size: 2em; color: #ffdc00; height: 35px; margin-bottom: 10px; }
+        #avatar-carousel-wrapper { display: flex; align-items: center; justify-content: center; width: 100%; }
+        #avatar-carousel { width: 90vw; height: 250px; overflow: hidden; position: relative; }
+        #avatar-strip { display: flex; align-items: center; height: 100%; position: absolute; left: 0; top: 0; transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1); }
+        .carousel-avatar { width: 200px; height: 200px; object-fit: cover; margin: 25px 15px; border: 5px solid #555; transition: all 0.5s ease; opacity: 0.3; transform: scale(0.6); cursor: pointer; }
+        .carousel-avatar.active { border-color: #ffdc00; opacity: 1; transform: scale(1); }
+        .nav-button { font-size: 3em; border: none; background: none; color: #fff; padding: 0 5px; z-index: 10; }
+
+        @media (min-width: 768px) {
+            #avatar-screen { max-width: 800px; }
+            #avatar-name-display { font-size: 2.5em; height: 40px; }
+            #avatar-carousel { width: 700px; height: 350px; }
+            .carousel-avatar { width: 300px; height: 300px; margin: 25px 20px; }
+            .nav-button { font-size: 4em; padding: 0 20px; }
+        }
     </style>
 </head>
 <body>
@@ -71,9 +82,11 @@
     <div id="avatar-screen" class="container hidden">
         <h1>Choose Your Animatronic</h1>
         <h2 id="avatar-name-display">Freddy</h2>
-        <div id="avatar-display-wrapper">
+        <div id="avatar-carousel-wrapper">
             <button id="prev-avatar" class="nav-button">◄</button>
-            <img id="main-avatar-display" src="">
+            <div id="avatar-carousel">
+                <div id="avatar-strip"></div>
+            </div>
             <button id="next-avatar" class="nav-button">►</button>
         </div>
         <button id="confirm-avatar-button">Select This Animatronic</button>
@@ -127,7 +140,6 @@
         ];
 
         let selectedColor = null, selectedAvatar = null, currentAvatarIndex = 0, sabotageInterval;
-        let isTransitioning = false;
         
         const joinScreen = document.getElementById('join-screen');
         const avatarScreen = document.getElementById('avatar-screen');
@@ -147,47 +159,47 @@
         const chatModeToggle = document.getElementById('chat-mode-toggle');
         const showAvatarScreenButton = document.getElementById('show-avatar-screen-button');
         const selectedAvatarPreview = document.getElementById('selected-avatar-preview');
-        const mainAvatarDisplay = document.getElementById('main-avatar-display');
+        const avatarStrip = document.getElementById('avatar-strip');
         const avatarNameDisplay = document.getElementById('avatar-name-display');
         const prevAvatarButton = document.getElementById('prev-avatar');
         const nextAvatarButton = document.getElementById('next-avatar');
         const confirmAvatarButton = document.getElementById('confirm-avatar-button');
 
-        function updateAvatarDisplay() {
-            if (isTransitioning) return;
-            isTransitioning = true;
-            mainAvatarDisplay.classList.add('loading');
-            setTimeout(() => {
-                const newAvatar = avatars[currentAvatarIndex];
-                mainAvatarDisplay.src = `https://crandyisatwork.github.io/fnaf-terminal/${newAvatar.path}`;
-                avatarNameDisplay.textContent = newAvatar.name;
-                mainAvatarDisplay.onload = () => {
-                    mainAvatarDisplay.classList.remove('loading');
-                    isTransitioning = false;
-                };
-                mainAvatarDisplay.onerror = () => { // Handle broken images
-                    mainAvatarDisplay.classList.remove('loading');
-                    isTransitioning = false;
-                }
-            }, 300);
+        function populateAvatars() {
+            avatars.forEach((avatar, index) => {
+                const img = document.createElement('img');
+                img.src = `https://crandyisatwork.github.io/fnaf-terminal/${avatar.path}`;
+                img.classList.add('carousel-avatar');
+                img.dataset.index = index;
+                if (index === 0) { img.classList.add('active'); }
+                img.addEventListener('click', () => { currentAvatarIndex = index; updateCarousel(); });
+                avatarStrip.appendChild(img);
+            });
+            setTimeout(updateCarousel, 100); 
+        }
+
+        function updateCarousel() {
+            const avatarCarousel = document.getElementById('avatar-carousel');
+            const firstAvatar = avatarStrip.querySelector('.carousel-avatar');
+            if (!firstAvatar) return;
+            const style = window.getComputedStyle(firstAvatar);
+            const marginLeft = parseFloat(style.marginLeft);
+            const marginRight = parseFloat(style.marginRight);
+            const itemWidth = firstAvatar.offsetWidth + marginLeft + marginRight;
+            const containerWidth = avatarCarousel.offsetWidth;
+            const offset = (containerWidth / 2) - (itemWidth / 2) - (currentAvatarIndex * itemWidth);
+            avatarStrip.style.transform = `translateX(${offset}px)`;
+            avatarNameDisplay.textContent = avatars[currentAvatarIndex].name;
+            document.querySelectorAll('.carousel-avatar').forEach(img => {
+                img.classList.remove('active');
+                if (parseInt(img.dataset.index) === currentAvatarIndex) { img.classList.add('active'); }
+            });
         }
         
-        showAvatarScreenButton.addEventListener('click', () => {
-            joinScreen.classList.add('hidden');
-            avatarScreen.classList.remove('hidden');
-            updateAvatarDisplay();
-        });
-
-        prevAvatarButton.addEventListener('click', () => {
-            currentAvatarIndex = (currentAvatarIndex > 0) ? currentAvatarIndex - 1 : avatars.length - 1;
-            updateAvatarDisplay();
-        });
-
-        nextAvatarButton.addEventListener('click', () => {
-            currentAvatarIndex = (currentAvatarIndex < avatars.length - 1) ? currentAvatarIndex + 1 : 0;
-            updateAvatarDisplay();
-        });
-
+        window.addEventListener('resize', updateCarousel);
+        showAvatarScreenButton.addEventListener('click', () => { joinScreen.classList.add('hidden'); avatarScreen.classList.remove('hidden'); });
+        prevAvatarButton.addEventListener('click', () => { currentAvatarIndex = (currentAvatarIndex > 0) ? currentAvatarIndex - 1 : avatars.length - 1; updateCarousel(); });
+        nextAvatarButton.addEventListener('click', () => { currentAvatarIndex = (currentAvatarIndex < avatars.length - 1) ? currentAvatarIndex + 1 : 0; updateCarousel(); });
         confirmAvatarButton.addEventListener('click', () => {
             selectedAvatar = avatars[currentAvatarIndex].path;
             selectedAvatarPreview.src = `https://crandyisatwork.github.io/fnaf-terminal/${selectedAvatar}`;
@@ -303,6 +315,8 @@
             sabotageButton.disabled = false;
             sabotageButton.textContent = 'Sabotage Task (60s)';
         });
+        
+        populateAvatars();
     </script>
 </body>
 </html>
