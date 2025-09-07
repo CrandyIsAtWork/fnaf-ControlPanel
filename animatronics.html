@@ -95,7 +95,7 @@
     <div id="controls-screen" class="container screen-constrained hidden">
         <h1 id="room-title">Room: ABCD</h1>
         <div class="controls-buttons">
-            <button id="ad-button">Activate Annoying Ad</button>
+            <button id="ad-button">Activate Annoying Ad (30s)</button>
             <button id="sabotage-button" class="ability-btn">Sabotage Task (60s)</button>
             <button id="glitch-button" class="ability-btn">System Glitch (45s)</button>
             <input type="text" id="message-input" placeholder="Type a message..." maxlength="50">
@@ -139,7 +139,7 @@
             { name: 'Viper Ghostface', path: 'avatars/avatar37.jpg' }, { name: 'Michael Myers', path: 'avatars/avatar38.jpg' }
         ];
 
-        let selectedColor = null, selectedAvatar = null, currentAvatarIndex = 0, sabotageInterval;
+        let selectedColor = null, selectedAvatar = null, currentAvatarIndex = 0;
         
         const joinScreen = document.getElementById('join-screen');
         const avatarScreen = document.getElementById('avatar-screen');
@@ -164,6 +164,20 @@
         const prevAvatarButton = document.getElementById('prev-avatar');
         const nextAvatarButton = document.getElementById('next-avatar');
         const confirmAvatarButton = document.getElementById('confirm-avatar-button');
+        
+        // --- MODIFICATION START ---
+        const cooldownIntervals = {};
+        const originalButtonText = {
+            ad: adButton.textContent,
+            sabotage: sabotageButton.textContent,
+            glitch: glitchButton.textContent
+        };
+        const abilityButtons = {
+            ad: adButton,
+            sabotage: sabotageButton,
+            glitch: glitchButton
+        };
+        // --- MODIFICATION END ---
 
         function populateAvatars() {
             avatars.forEach((avatar, index) => {
@@ -226,34 +240,11 @@
             socket.emit('join-game', { roomCode, playerName, playerColor: selectedColor, playerAvatar: selectedAvatar });
         });
 
-        adButton.addEventListener('click', () => {
-            socket.emit('activate-event', { type: 'ad' });
-            let cooldown;
-            const random = Math.random();
-            if (random < 0.05) { cooldown = 5; } else if (random < 0.15) { cooldown = 20; } else if (random < 0.50) { cooldown = 30; } else { cooldown = 35; }
-            adButton.disabled = true;
-            const originalText = adButton.textContent;
-            adButton.textContent = `On Cooldown (${cooldown}s)`;
-            const interval = setInterval(() => {
-                cooldown--;
-                adButton.textContent = `On Cooldown (${cooldown}s)`;
-                if (cooldown <= 0) { clearInterval(interval); adButton.disabled = false; adButton.textContent = originalText; }
-            }, 1000);
-        });
-
-        sabotageButton.addEventListener('click', () => { socket.emit('sabotage-task'); });
-
-        glitchButton.addEventListener('click', () => {
-            socket.emit('system-glitch');
-            glitchButton.disabled = true;
-            let cooldown = 45;
-            glitchButton.textContent = `System Glitch (${cooldown}s)`;
-            const interval = setInterval(() => {
-                cooldown--;
-                glitchButton.textContent = `System Glitch (${cooldown}s)`;
-                if (cooldown <= 0) { clearInterval(interval); glitchButton.disabled = false; glitchButton.textContent = 'System Glitch (45s)'; }
-            }, 1000);
-        });
+        // --- MODIFICATION START ---
+        adButton.addEventListener('click', () => { socket.emit('use-ability', { ability: 'ad' }); });
+        sabotageButton.addEventListener('click', () => { socket.emit('use-ability', { ability: 'sabotage' }); });
+        glitchButton.addEventListener('click', () => { socket.emit('use-ability', { ability: 'glitch' }); });
+        // --- MODIFICATION END ---
 
         sendButton.addEventListener('click', () => {
             const message = messageInput.value.trim();
@@ -298,23 +289,37 @@
             messageLog.scrollTop = messageLog.scrollHeight;
         });
 
-        socket.on('start-sabotage-cooldown', () => {
-            sabotageButton.disabled = true;
-            let cooldown = 60;
-            sabotageButton.textContent = `Sabotage Task (${cooldown}s)`;
-            clearInterval(sabotageInterval);
-            sabotageInterval = setInterval(() => {
+        // --- MODIFICATION START ---
+        socket.on('start-cooldown', (data) => {
+            const { ability, duration } = data;
+            const button = abilityButtons[ability];
+            if (!button) return;
+
+            button.disabled = true;
+            let cooldown = Math.ceil(duration / 1000);
+            
+            clearInterval(cooldownIntervals[ability]);
+
+            button.textContent = `${originalButtonText[ability].split(' (')[0]} (${cooldown}s)`;
+            cooldownIntervals[ability] = setInterval(() => {
                 cooldown--;
-                sabotageButton.textContent = `Sabotage Task (${cooldown}s)`;
-                if (cooldown <= 0) { clearInterval(sabotageInterval); }
+                button.textContent = `${originalButtonText[ability].split(' (')[0]} (${cooldown}s)`;
+                if (cooldown <= 0) {
+                    clearInterval(cooldownIntervals[ability]);
+                }
             }, 1000);
         });
         
-        socket.on('sabotage-ready', () => {
-            clearInterval(sabotageInterval);
-            sabotageButton.disabled = false;
-            sabotageButton.textContent = 'Sabotage Task (60s)';
+        socket.on('cooldown-ready', (data) => {
+            const { ability } = data;
+            const button = abilityButtons[ability];
+            if (!button) return;
+
+            clearInterval(cooldownIntervals[ability]);
+            button.disabled = false;
+            button.textContent = originalButtonText[ability];
         });
+        // --- MODIFICATION END ---
         
         populateAvatars();
     </script>
