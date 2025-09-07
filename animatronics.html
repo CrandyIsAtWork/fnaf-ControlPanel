@@ -9,24 +9,29 @@
         /* General Body Styles */
         html, body { height: 100%; margin: 0; padding: 0; }
         body { font-family: 'VT323', monospace; background-color: #1a1a1a; color: white; text-align: center; user-select: none; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px; box-sizing: border-box; }
-        .container { display: flex; flex-direction: column; align-items: center; width: 100%; }
+        .container { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 420px; }
         h1 { color: #ff4500; font-size: 2.5em; text-shadow: 2px 2px #000; margin: 0 0 15px 0; }
         h2 { color: #ccc; font-size: 1.5em; margin: 15px 0 5px 0; }
-        .hidden { display: none; }
+        .hidden { display: none !important; }
+
+        /* General Input and Button Styles */
         input[type="text"] { font-family: 'VT323', monospace; font-size: 1.5em; width: 90%; max-width: 400px; padding: 10px; margin-bottom: 10px; background-color: #0a0a0a; border: 3px solid #555; color: white; text-align: center; }
         button { width: 90%; max-width: 400px; margin: 8px 0; padding: 15px; font-family: 'VT323', monospace; font-size: 1.8em; cursor: pointer; border: 3px solid #ff4500; background-color: transparent; color: #ff4500; transition: all 0.2s ease; }
         button:hover:not(:disabled) { background-color: #ff4500; color: #fff; }
         button:disabled { border-color: #555; color: #555; cursor: not-allowed; }
+
+        /* Join Screen Styles */
         .selection-group { display: flex; justify-content: center; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; }
-        .color-swatch { width: 40px; height: 40px; cursor: pointer; border: 4px solid #444; transition: border-color 0.2s; }
+        .color-swatch { width: 40px; height: 40px; cursor: pointer; border: 4px solid #444; }
         .color-swatch.selected { border-color: #fff; }
-        .avatar-select { width: 60px; height: 60px; cursor: pointer; border: 4px solid #444; transition: border-color 0.2s; }
-        .avatar-select.selected { border-color: #fff; }
+        #avatar-selection-area { display: flex; align-items: center; justify-content: center; gap: 20px; width: 100%; }
+        #show-avatar-screen-button { width: 60%; margin: 8px 0; }
+        #selected-avatar-preview { width: 80px; height: 80px; border: 4px solid #fff; visibility: hidden; }
+
+        /* Controls Screen Styles */
         .controls-buttons { display: flex; flex-direction: column; align-items: center; width: 100%; }
         .sound-btn { border-color: #7a00ff; color: #7a00ff; }
-        .sound-btn:hover:not(:disabled) { background-color: #7a00ff; color: #fff; }
         .ability-btn { border-color: #ff00de; color: #ff00de; }
-        .ability-btn:hover:not(:disabled) { background-color: #ff00de; color: #fff; }
         .chat-mode { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 5px 0; color: #aaa; }
         .switch { position: relative; display: inline-block; width: 50px; height: 24px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -37,6 +42,16 @@
         #message-log { width: 90%; max-width: 400px; height: 120px; background-color: #0a0a0a; border: 3px solid #555; margin-top: 20px; padding: 10px; list-style: none; overflow-y: auto; text-align: left; font-size: 1.1em; box-sizing: border-box; }
         #message-log li { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; padding-bottom: 5px; border-bottom: 1px dashed #333; word-break: break-all; }
         .message-avatar { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #555; flex-shrink: 0; }
+        
+        /* Avatar Carousel Styles */
+        #avatar-screen { width: 100%; }
+        #avatar-name-display { font-size: 2em; color: #ffdc00; height: 40px; }
+        #avatar-carousel-wrapper { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+        #avatar-carousel { width: 200px; height: 200px; overflow: hidden; position: relative; }
+        #avatar-strip { display: flex; align-items: center; height: 100%; position: absolute; left: 50%; top: 0; transform: translateX(-100px); transition: transform 0.5s ease; }
+        .carousel-avatar { width: 160px; height: 160px; margin: 20px 10px; border: 5px solid #555; transition: all 0.5s ease; opacity: 0.5; transform: scale(0.8); cursor: pointer; }
+        .carousel-avatar.active { border-color: #ffdc00; opacity: 1; transform: scale(1); }
+        .nav-button { font-size: 3em; border: none; background: none; color: #fff; padding: 0 20px; }
     </style>
 </head>
 <body>
@@ -53,16 +68,26 @@
             <div class="color-swatch" data-color="#b10dc9" style="background-color:#b10dc9;"></div>
         </div>
         <h2>Choose Your Avatar</h2>
-        <div class="selection-group" id="avatar-selector">
-            <img class="avatar-select" src="https://crandyisatwork.github.io/fnaf-terminal/avatars/avatar1.jpg" data-avatar="avatars/avatar1.jpg">
-            <img class="avatar-select" src="https://crandyisatwork.github.io/fnaf-terminal/avatars/avatar2.jpg" data-avatar="avatars/avatar2.jpg">
-            <img class="avatar-select" src="https://crandyisatwork.github.io/fnaf-terminal/avatars/avatar3.jpg" data-avatar="avatars/avatar3.jpg">
-            <img class="avatar-select" src="https://crandyisatwork.github.io/fnaf-terminal/avatars/avatar4.jpg" data-avatar="avatars/avatar4.jpg">
-            <img class="avatar-select" src="https://crandyisatwork.github.io/fnaf-terminal/avatars/avatar5.jpg" data-avatar="avatars/avatar5.jpg">
-            <img class="avatar-select" src="https://crandyisatwork.github.io/fnaf-terminal/avatars/avatar6.jpg" data-avatar="avatars/avatar6.jpg">
+        <div id="avatar-selection-area">
+            <button id="show-avatar-screen-button">Select Avatar</button>
+            <img id="selected-avatar-preview" src="">
         </div>
         <input type="text" id="room-code-input" placeholder="Enter Room Code" maxlength="4">
         <button id="join-button">Join Game</button>
+    </div>
+
+    <div id="avatar-screen" class="container hidden">
+        <h1>Choose Your Animatronic</h1>
+        <h2 id="avatar-name-display">Freddy Fazbear</h2>
+        <div id="avatar-carousel-wrapper">
+            <button id="prev-avatar" class="nav-button">◄</button>
+            <div id="avatar-carousel">
+                <div id="avatar-strip">
+                    </div>
+            </div>
+            <button id="next-avatar" class="nav-button">►</button>
+        </div>
+        <button id="confirm-avatar-button">Select This Animatronic</button>
     </div>
 
     <div id="controls-screen" class="container hidden">
@@ -90,12 +115,41 @@
     <script>
         const socket = io('https://8b503b84-132c-4149-bdb3-8bef57ec4fd8-00-2ga0ewjtdd2yk.worf.replit.dev');
 
-        // --- Element Selectors ---
+        // --- DATA ---
+        const avatars = [
+            { name: 'Freddy Fazbear', path: 'avatars/avatar1.jpg' }, { name: 'Bonnie', path: 'avatars/avatar2.jpg' },
+            { name: 'Chica', path: 'avatars/avatar3.jpg' }, { name: 'Foxy', path: 'avatars/avatar4.jpg' },
+            { name: 'Golden Freddy', path: 'avatars/avatar5.jpg' }, { name: 'The Puppet', path: 'avatars/avatar6.jpg' },
+            { name: 'Toy Freddy', path: 'avatars/avatar7.jpg' }, { name: 'Toy Bonnie', path: 'avatars/avatar8.jpg' },
+            { name: 'Toy Chica', path: 'avatars/avatar9.jpg' }, { name: 'Mangle', path: 'avatars/avatar10.jpg' },
+            { name: 'Balloon Boy', path: 'avatars/avatar11.jpg' }, { name: 'Withered Freddy', path: 'avatars/avatar12.jpg' },
+            { name: 'Withered Bonnie', path: 'avatars/avatar13.jpg' }, { name: 'Withered Chica', path: 'avatars/avatar14.jpg' },
+            { name: 'Withered Foxy', path: 'avatars/avatar15.jpg' }, { name: 'Shadow Freddy', path: 'avatars/avatar16.jpg' },
+            { name: 'Shadow Bonnie', path: 'avatars/avatar17.jpg' }, { name: 'Springtrap', path: 'avatars/avatar18.jpg' },
+            { name: 'Phantom Freddy', path: 'avatars/avatar19.jpg' }, { name: 'Phantom Chica', path: 'avatars/avatar20.jpg' },
+            { name: 'Phantom Foxy', path: 'avatars/avatar21.jpg' }, { name: 'Phantom Mangle', path: 'avatars/avatar22.jpg' },
+            { name: 'Phantom Puppet', path: 'avatars/avatar23.jpg' }, { name: 'Nightmare Freddy', path: 'avatars/avatar24.jpg' },
+            { name: 'Nightmare Bonnie', path: 'avatars/avatar25.jpg' }, { name: 'Nightmare Chica', path: 'avatars/avatar26.jpg' },
+            { name: 'Nightmare Foxy', path: 'avatars/avatar27.jpg' }, { name: 'Nightmare Fredbear', path: 'avatars/avatar28.jpg' },
+            { name: 'Nightmare', path: 'avatars/avatar29.jpg' }, { name: 'Plushtrap', path: 'avatars/avatar30.jpg' },
+            { name: 'Circus Baby', path: 'avatars/avatar31.jpg' }, { name: 'Ballora', path: 'avatars/avatar32.jpg' },
+            { name: 'Funtime Freddy', path: 'avatars/avatar33.jpg' }, { name: 'Funtime Foxy', path: 'avatars/avatar34.jpg' },
+            { name: 'Ennard', path: 'avatars/avatar35.jpg' }, { name: 'Scrap Baby', path: 'avatars/avatar36.jpg' },
+            { name: 'Molten Freddy', path: 'avatars/avatar37.jpg' }, { name: 'Lefty', path: 'avatars/avatar38.jpg' }
+        ];
+
+        // --- STATE ---
+        let selectedColor = null;
+        let selectedAvatar = null;
+        let currentAvatarIndex = 0;
+        let sabotageInterval;
+
+        // --- SELECTORS ---
         const joinScreen = document.getElementById('join-screen');
+        const avatarScreen = document.getElementById('avatar-screen');
         const controlsScreen = document.getElementById('controls-screen');
         const playerNameInput = document.getElementById('player-name-input');
         const colorSelector = document.getElementById('color-selector');
-        const avatarSelector = document.getElementById('avatar-selector');
         const roomCodeInput = document.getElementById('room-code-input');
         const joinButton = document.getElementById('join-button');
         const roomTitle = document.getElementById('room-title');
@@ -107,12 +161,66 @@
         const soundButtons = document.querySelectorAll('.sound-btn');
         const messageLog = document.getElementById('message-log');
         const chatModeToggle = document.getElementById('chat-mode-toggle');
+        const showAvatarScreenButton = document.getElementById('show-avatar-screen-button');
+        const selectedAvatarPreview = document.getElementById('selected-avatar-preview');
+        const avatarStrip = document.getElementById('avatar-strip');
+        const avatarNameDisplay = document.getElementById('avatar-name-display');
+        const prevAvatarButton = document.getElementById('prev-avatar');
+        const nextAvatarButton = document.getElementById('next-avatar');
+        const confirmAvatarButton = document.getElementById('confirm-avatar-button');
 
-        let selectedColor = null;
-        let selectedAvatar = null;
-        let sabotageInterval;
+        // --- AVATAR SELECTION LOGIC ---
+        function populateAvatars() {
+            avatars.forEach((avatar, index) => {
+                const img = document.createElement('img');
+                img.src = `https://crandyisatwork.github.io/fnaf-terminal/${avatar.path}`;
+                img.classList.add('carousel-avatar');
+                img.dataset.index = index;
+                if (index === 0) { img.classList.add('active'); }
+                img.addEventListener('click', () => {
+                    currentAvatarIndex = index;
+                    updateCarousel();
+                });
+                avatarStrip.appendChild(img);
+            });
+        }
 
-        // --- Selection Logic ---
+        function updateCarousel() {
+            const offset = -currentAvatarIndex * 180;
+            avatarStrip.style.transform = `translateX(calc(-100px + ${offset}px))`;
+            avatarNameDisplay.textContent = avatars[currentAvatarIndex].name;
+            document.querySelectorAll('.carousel-avatar').forEach(img => {
+                img.classList.remove('active');
+                if (parseInt(img.dataset.index) === currentAvatarIndex) {
+                    img.classList.add('active');
+                }
+            });
+        }
+        
+        showAvatarScreenButton.addEventListener('click', () => {
+            joinScreen.classList.add('hidden');
+            avatarScreen.classList.remove('hidden');
+        });
+
+        prevAvatarButton.addEventListener('click', () => {
+            currentAvatarIndex = (currentAvatarIndex > 0) ? currentAvatarIndex - 1 : avatars.length - 1;
+            updateCarousel();
+        });
+
+        nextAvatarButton.addEventListener('click', () => {
+            currentAvatarIndex = (currentAvatarIndex < avatars.length - 1) ? currentAvatarIndex + 1 : 0;
+            updateCarousel();
+        });
+
+        confirmAvatarButton.addEventListener('click', () => {
+            selectedAvatar = avatars[currentAvatarIndex].path;
+            selectedAvatarPreview.src = `https://crandyisatwork.github.io/fnaf-terminal/${selectedAvatar}`;
+            selectedAvatarPreview.style.visibility = 'visible';
+            avatarScreen.classList.add('hidden');
+            joinScreen.classList.remove('hidden');
+        });
+
+        // --- JOIN SCREEN LOGIC ---
         colorSelector.addEventListener('click', (e) => {
             if (e.target.classList.contains('color-swatch')) {
                 colorSelector.querySelectorAll('.selected').forEach(el => el.classList.remove('selected'));
@@ -121,32 +229,17 @@
             }
         });
 
-        avatarSelector.addEventListener('click', (e) => {
-            if (e.target.classList.contains('avatar-select')) {
-                avatarSelector.querySelectorAll('.selected').forEach(el => el.classList.remove('selected'));
-                e.target.classList.add('selected');
-                selectedAvatar = e.target.dataset.avatar;
-            }
-        });
-
         joinButton.addEventListener('click', () => {
             const roomCode = roomCodeInput.value.trim().toUpperCase();
             const playerName = playerNameInput.value.trim();
-
             if (!playerName || !selectedColor || !selectedAvatar || !roomCode) {
                 alert('Please enter a name, select a color, choose an avatar, and enter a room code.');
                 return;
             }
-
-            socket.emit('join-game', {
-                roomCode,
-                playerName,
-                playerColor: selectedColor,
-                playerAvatar: selectedAvatar
-            });
+            socket.emit('join-game', { roomCode, playerName, playerColor: selectedColor, playerAvatar: selectedAvatar });
         });
 
-        // --- Controls Screen Logic ---
+        // --- CONTROLS SCREEN LOGIC ---
         adButton.addEventListener('click', () => {
             socket.emit('activate-event', { type: 'ad' });
             let cooldown;
@@ -161,17 +254,11 @@
             const interval = setInterval(() => {
                 cooldown--;
                 adButton.textContent = `On Cooldown (${cooldown}s)`;
-                if (cooldown <= 0) {
-                    clearInterval(interval);
-                    adButton.disabled = false;
-                    adButton.textContent = originalText;
-                }
+                if (cooldown <= 0) { clearInterval(interval); adButton.disabled = false; adButton.textContent = originalText; }
             }, 1000);
         });
 
-        sabotageButton.addEventListener('click', () => {
-            socket.emit('sabotage-task');
-        });
+        sabotageButton.addEventListener('click', () => { socket.emit('sabotage-task'); });
 
         glitchButton.addEventListener('click', () => {
             socket.emit('system-glitch');
@@ -181,11 +268,7 @@
             const interval = setInterval(() => {
                 cooldown--;
                 glitchButton.textContent = `System Glitch (${cooldown}s)`;
-                if (cooldown <= 0) {
-                    clearInterval(interval);
-                    glitchButton.disabled = false;
-                    glitchButton.textContent = 'System Glitch (45s)';
-                }
+                if (cooldown <= 0) { clearInterval(interval); glitchButton.disabled = false; glitchButton.textContent = 'System Glitch (45s)'; }
             }, 1000);
         });
 
@@ -193,11 +276,8 @@
             const message = messageInput.value.trim();
             if (message) {
                 const isPrivate = chatModeToggle.checked;
-                if (isPrivate) {
-                    socket.emit('send-private-message', { message: message });
-                } else {
-                    socket.emit('send-message', { message: message });
-                }
+                if (isPrivate) { socket.emit('send-private-message', { message: message }); } 
+                else { socket.emit('send-message', { message: message }); }
                 messageInput.value = '';
             }
         });
@@ -208,46 +288,32 @@
                 socket.emit('play-sound', { soundName: soundName });
             });
         });
-        
-        // --- Socket Listeners ---
+
+        // --- SOCKET LISTENERS ---
         socket.on('join-successful', (data) => {
             roomTitle.textContent = `Room: ${data.roomCode}`;
             joinScreen.classList.add('hidden');
             controlsScreen.classList.remove('hidden');
         });
-        
-        socket.on('invalid-room', () => {
-            alert('Invalid Room Code. Please try again.');
-        });
-
-        socket.on('connect', () => {
-            console.log('Successfully connected to the server!');
-        });
-        
+        socket.on('invalid-room', () => { alert('Invalid Room Code. Please try again.'); });
+        socket.on('connect', () => { console.log('Successfully connected to the server!'); });
         socket.on('receive-message', (data) => {
             const { message, sender } = data;
-            
             messageLog.classList.remove('hidden');
             const messageItem = document.createElement('li');
             const avatarImg = document.createElement('img');
             const textContainer = document.createElement('div');
             const senderName = document.createElement('strong');
-
             avatarImg.classList.add('message-avatar');
             avatarImg.src = `https://crandyisatwork.github.io/fnaf-terminal/${sender.avatar}`;
-
             senderName.textContent = `${sender.name}: `;
             senderName.style.color = sender.color;
             textContainer.appendChild(senderName);
             textContainer.appendChild(document.createTextNode(message));
-            
             messageItem.appendChild(avatarImg);
             messageItem.appendChild(textContainer);
             messageLog.appendChild(messageItem);
-
-            if (messageLog.children.length > 5) {
-                messageLog.removeChild(messageLog.firstChild);
-            }
+            if (messageLog.children.length > 5) { messageLog.removeChild(messageLog.firstChild); }
             messageLog.scrollTop = messageLog.scrollHeight;
         });
 
@@ -259,9 +325,7 @@
             sabotageInterval = setInterval(() => {
                 cooldown--;
                 sabotageButton.textContent = `Sabotage Task (${cooldown}s)`;
-                if (cooldown <= 0) {
-                    clearInterval(sabotageInterval);
-                }
+                if (cooldown <= 0) { clearInterval(sabotageInterval); }
             }, 1000);
         });
 
@@ -270,6 +334,9 @@
             sabotageButton.disabled = false;
             sabotageButton.textContent = 'Sabotage Task (60s)';
         });
+        
+        // --- INITIALIZATION ---
+        populateAvatars();
     </script>
 </body>
 </html>
