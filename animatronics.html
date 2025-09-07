@@ -26,7 +26,7 @@
         .color-swatch.selected { border-color: #fff; }
         #avatar-selection-area { display: flex; align-items: center; justify-content: center; gap: 20px; width: 100%; }
         #show-avatar-screen-button { width: 60%; margin: 8px 0; }
-        #selected-avatar-preview { width: 80px; height: 80px; border: 4px solid #fff; visibility: hidden; }
+        #selected-avatar-preview { width: 80px; height: 80px; border: 4px solid #fff; visibility: hidden; object-fit: cover; }
 
         /* Controls Screen Styles */
         .controls-buttons { display: flex; flex-direction: column; align-items: center; width: 100%; }
@@ -43,13 +43,13 @@
         #message-log li { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; padding-bottom: 5px; border-bottom: 1px dashed #333; word-break: break-all; }
         .message-avatar { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #555; flex-shrink: 0; }
         
-        /* Avatar Carousel Styles */
-        #avatar-screen { width: 100%; }
-        #avatar-name-display { font-size: 2em; color: #ffdc00; height: 40px; margin-bottom: 10px; }
-        #avatar-carousel-wrapper { display: flex; align-items: center; justify-content: space-between; width: 100%; }
-        #avatar-carousel { width: 300px; height: 300px; overflow: hidden; position: relative; }
-        #avatar-strip { display: flex; align-items: center; height: 100%; position: absolute; top: 0; transition: transform 0.4s ease-out; }
-        .carousel-avatar { width: 250px; height: 250px; object-fit: cover; margin: 25px 15px; border: 5px solid #555; transition: all 0.4s ease-out; opacity: 0.4; transform: scale(0.6); cursor: pointer; }
+        /* NEW: LARGER, STABLE AVATAR CAROUSEL STYLES */
+        #avatar-screen { width: 100%; max-width: 500px; /* Give it a max width */ }
+        #avatar-name-display { font-size: 2.2em; color: #ffdc00; height: 40px; margin-bottom: 10px; }
+        #avatar-carousel-wrapper { display: flex; align-items: center; justify-content: center; width: 100%; }
+        #avatar-carousel { width: 400px; height: 350px; overflow: hidden; position: relative; }
+        #avatar-strip { display: flex; align-items: center; height: 100%; position: absolute; transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1); /* Smoother transition */ }
+        .carousel-avatar { width: 300px; height: 300px; object-fit: cover; margin: 25px 20px; border: 5px solid #555; transition: all 0.5s ease; opacity: 0.3; transform: scale(0.5); cursor: pointer; }
         .carousel-avatar.active { border-color: #ffdc00; opacity: 1; transform: scale(1); }
         .nav-button { font-size: 3em; border: none; background: none; color: #fff; padding: 0 10px; }
     </style>
@@ -115,7 +115,6 @@
     <script>
         const socket = io('https://8b503b84-132c-4149-bdb3-8bef57ec4fd8-00-2ga0ewjtdd2yk.worf.replit.dev');
 
-        // --- DATA WITH CORRECT NAMES ---
         const avatars = [
             { name: 'Freddy', path: 'avatars/avatar1.jpg' }, { name: 'Bonnie', path: 'avatars/avatar2.jpg' },
             { name: 'Chica', path: 'avatars/avatar3.jpg' }, { name: 'Foxy', path: 'avatars/avatar4.jpg' },
@@ -138,13 +137,11 @@
             { name: 'Viper Ghostface', path: 'avatars/avatar37.jpg' }, { name: 'Michael Myers', path: 'avatars/avatar38.jpg' }
         ];
 
-        // --- STATE ---
         let selectedColor = null;
         let selectedAvatar = null;
         let currentAvatarIndex = 0;
         let sabotageInterval;
 
-        // --- SELECTORS ---
         const joinScreen = document.getElementById('join-screen');
         const avatarScreen = document.getElementById('avatar-screen');
         const controlsScreen = document.getElementById('controls-screen');
@@ -169,7 +166,6 @@
         const nextAvatarButton = document.getElementById('next-avatar');
         const confirmAvatarButton = document.getElementById('confirm-avatar-button');
 
-        // --- AVATAR SELECTION LOGIC ---
         function populateAvatars() {
             avatars.forEach((avatar, index) => {
                 const img = document.createElement('img');
@@ -183,13 +179,17 @@
                 });
                 avatarStrip.appendChild(img);
             });
-            updateCarousel(); // Initial call to position correctly
+            updateCarousel();
         }
 
+        // NEW, MORE STABLE CALCULATION
         function updateCarousel() {
-            const itemWidth = 280; // Image width (250) + total margin (30)
-            const initialOffset = (300 - 250) / 2; // (Carousel width - Image width) / 2
+            const itemWidth = 300 + 40; // Image width (300) + total margin (40)
+            const containerWidth = 400; // Width of #avatar-carousel
+            
+            const initialOffset = (containerWidth - 300) / 2;
             const offset = initialOffset - (currentAvatarIndex * itemWidth);
+
             avatarStrip.style.transform = `translateX(${offset}px)`;
             avatarNameDisplay.textContent = avatars[currentAvatarIndex].name;
             document.querySelectorAll('.carousel-avatar').forEach(img => {
@@ -223,7 +223,6 @@
             joinScreen.classList.remove('hidden');
         });
 
-        // --- JOIN SCREEN LOGIC ---
         colorSelector.addEventListener('click', (e) => {
             if (e.target.classList.contains('color-swatch')) {
                 colorSelector.querySelectorAll('.selected').forEach(el => el.classList.remove('selected'));
@@ -242,7 +241,6 @@
             socket.emit('join-game', { roomCode, playerName, playerColor: selectedColor, playerAvatar: selectedAvatar });
         });
 
-        // --- CONTROLS SCREEN LOGIC ---
         adButton.addEventListener('click', () => {
             socket.emit('activate-event', { type: 'ad' });
             let cooldown;
@@ -292,12 +290,11 @@
             });
         });
 
-        // --- SOCKET LISTENERS ---
         socket.on('join-successful', (data) => {
             roomTitle.textContent = `Room: ${data.roomCode}`;
             joinScreen.classList.add('hidden');
             controlsScreen.classList.remove('hidden');
-        });
+});
         socket.on('invalid-room', () => { alert('Invalid Room Code. Please try again.'); });
         socket.on('connect', () => { console.log('Successfully connected to the server!'); });
         socket.on('receive-message', (data) => {
