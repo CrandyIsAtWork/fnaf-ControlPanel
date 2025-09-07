@@ -14,22 +14,16 @@
         h1 { color: #ff4500; font-size: 2.5em; text-shadow: 2px 2px #000; margin: 0 0 15px 0; }
         h2 { color: #ccc; font-size: 1.5em; margin: 15px 0 5px 0; }
         .hidden { display: none !important; }
-
-        /* General Input and Button Styles */
         input[type="text"] { font-family: 'VT323', monospace; font-size: 1.5em; width: 90%; max-width: 400px; padding: 10px; margin-bottom: 10px; background-color: #0a0a0a; border: 3px solid #555; color: white; text-align: center; }
         button { width: 90%; max-width: 400px; margin: 8px 0; padding: 15px; font-family: 'VT323', monospace; font-size: 1.8em; cursor: pointer; border: 3px solid #ff4500; background-color: transparent; color: #ff4500; transition: all 0.2s ease; }
         button:hover:not(:disabled) { background-color: #ff4500; color: #fff; }
         button:disabled { border-color: #555; color: #555; cursor: not-allowed; }
-
-        /* Join Screen Styles */
         .selection-group { display: flex; justify-content: center; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; }
         .color-swatch { width: 40px; height: 40px; cursor: pointer; border: 4px solid #444; }
         .color-swatch.selected { border-color: #fff; }
         #avatar-selection-area { display: flex; align-items: center; justify-content: center; gap: 20px; width: 100%; }
         #show-avatar-screen-button { width: 60%; margin: 8px 0; }
         #selected-avatar-preview { width: 80px; height: 80px; border: 4px solid #fff; visibility: hidden; object-fit: cover; }
-
-        /* Controls Screen Styles */
         .controls-buttons { display: flex; flex-direction: column; align-items: center; width: 100%; }
         .sound-btn { border-color: #7a00ff; color: #7a00ff; }
         .ability-btn { border-color: #ff00de; color: #ff00de; }
@@ -44,15 +38,23 @@
         #message-log li { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; padding-bottom: 5px; border-bottom: 1px dashed #333; word-break: break-all; }
         .message-avatar { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #555; flex-shrink: 0; }
         
-        /* WIDER & STABLE AVATAR CAROUSEL STYLES */
-        #avatar-screen { width: 100%; max-width: 800px; }
-        #avatar-name-display { font-size: 2.5em; color: #ffdc00; height: 40px; margin-bottom: 15px; }
+        /* RESPONSIVE AVATAR CAROUSEL STYLES */
+        #avatar-screen { width: 100%; }
+        #avatar-name-display { font-size: 2em; color: #ffdc00; height: 35px; margin-bottom: 10px; }
         #avatar-carousel-wrapper { display: flex; align-items: center; justify-content: center; width: 100%; }
-        #avatar-carousel { width: 90vw; max-width: 700px; height: 350px; overflow: hidden; position: relative; }
+        #avatar-carousel { width: 90vw; height: 250px; overflow: hidden; position: relative; }
         #avatar-strip { display: flex; align-items: center; height: 100%; position: absolute; left: 0; top: 0; transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1); }
-        .carousel-avatar { width: 300px; height: 300px; object-fit: cover; margin: 25px 20px; border: 5px solid #555; transition: all 0.5s ease; opacity: 0.3; transform: scale(0.6); cursor: pointer; }
+        .carousel-avatar { width: 200px; height: 200px; object-fit: cover; margin: 25px 15px; border: 5px solid #555; transition: all 0.5s ease; opacity: 0.3; transform: scale(0.6); cursor: pointer; }
         .carousel-avatar.active { border-color: #ffdc00; opacity: 1; transform: scale(1); }
-        .nav-button { font-size: 4em; border: none; background: none; color: #fff; padding: 0 20px; z-index: 10; }
+        .nav-button { font-size: 3em; border: none; background: none; color: #fff; padding: 0 5px; z-index: 10; }
+
+        @media (min-width: 768px) {
+            #avatar-screen { max-width: 800px; }
+            #avatar-name-display { font-size: 2.5em; height: 40px; }
+            #avatar-carousel { width: 700px; height: 350px; }
+            .carousel-avatar { width: 300px; height: 300px; margin: 25px 20px; }
+            .nav-button { font-size: 4em; padding: 0 20px; }
+        }
     </style>
 </head>
 <body>
@@ -83,8 +85,7 @@
         <div id="avatar-carousel-wrapper">
             <button id="prev-avatar" class="nav-button">◄</button>
             <div id="avatar-carousel">
-                <div id="avatar-strip">
-                    </div>
+                <div id="avatar-strip"></div>
             </div>
             <button id="next-avatar" class="nav-button">►</button>
         </div>
@@ -138,11 +139,8 @@
             { name: 'Viper Ghostface', path: 'avatars/avatar37.jpg' }, { name: 'Michael Myers', path: 'avatars/avatar38.jpg' }
         ];
 
-        let selectedColor = null;
-        let selectedAvatar = null;
-        let currentAvatarIndex = 0;
-        let sabotageInterval;
-
+        let selectedColor = null, selectedAvatar = null, currentAvatarIndex = 0, sabotageInterval;
+        
         const joinScreen = document.getElementById('join-screen');
         const avatarScreen = document.getElementById('avatar-screen');
         const controlsScreen = document.getElementById('controls-screen');
@@ -174,46 +172,34 @@
                 img.classList.add('carousel-avatar');
                 img.dataset.index = index;
                 if (index === 0) { img.classList.add('active'); }
-                img.addEventListener('click', () => {
-                    currentAvatarIndex = index;
-                    updateCarousel();
-                });
+                img.addEventListener('click', () => { currentAvatarIndex = index; updateCarousel(); });
                 avatarStrip.appendChild(img);
             });
-            updateCarousel();
+            setTimeout(updateCarousel, 100); 
         }
 
         function updateCarousel() {
             const avatarCarousel = document.getElementById('avatar-carousel');
-            const itemWidth = 300 + 40; // Image width (300) + total margin (40)
+            const firstAvatar = avatarStrip.querySelector('.carousel-avatar');
+            if (!firstAvatar) return;
+            const style = window.getComputedStyle(firstAvatar);
+            const marginLeft = parseFloat(style.marginLeft);
+            const marginRight = parseFloat(style.marginRight);
+            const itemWidth = firstAvatar.offsetWidth + marginLeft + marginRight;
             const containerWidth = avatarCarousel.offsetWidth;
             const offset = (containerWidth / 2) - (itemWidth / 2) - (currentAvatarIndex * itemWidth);
-
             avatarStrip.style.transform = `translateX(${offset}px)`;
             avatarNameDisplay.textContent = avatars[currentAvatarIndex].name;
             document.querySelectorAll('.carousel-avatar').forEach(img => {
                 img.classList.remove('active');
-                if (parseInt(img.dataset.index) === currentAvatarIndex) {
-                    img.classList.add('active');
-                }
+                if (parseInt(img.dataset.index) === currentAvatarIndex) { img.classList.add('active'); }
             });
         }
         
-        showAvatarScreenButton.addEventListener('click', () => {
-            joinScreen.classList.add('hidden');
-            avatarScreen.classList.remove('hidden');
-        });
-
-        prevAvatarButton.addEventListener('click', () => {
-            currentAvatarIndex = (currentAvatarIndex > 0) ? currentAvatarIndex - 1 : avatars.length - 1;
-            updateCarousel();
-        });
-
-        nextAvatarButton.addEventListener('click', () => {
-            currentAvatarIndex = (currentAvatarIndex < avatars.length - 1) ? currentAvatarIndex + 1 : 0;
-            updateCarousel();
-        });
-
+        window.addEventListener('resize', updateCarousel);
+        showAvatarScreenButton.addEventListener('click', () => { joinScreen.classList.add('hidden'); avatarScreen.classList.remove('hidden'); });
+        prevAvatarButton.addEventListener('click', () => { currentAvatarIndex = (currentAvatarIndex > 0) ? currentAvatarIndex - 1 : avatars.length - 1; updateCarousel(); });
+        nextAvatarButton.addEventListener('click', () => { currentAvatarIndex = (currentAvatarIndex < avatars.length - 1) ? currentAvatarIndex + 1 : 0; updateCarousel(); });
         confirmAvatarButton.addEventListener('click', () => {
             selectedAvatar = avatars[currentAvatarIndex].path;
             selectedAvatarPreview.src = `https://crandyisatwork.github.io/fnaf-terminal/${selectedAvatar}`;
@@ -244,10 +230,7 @@
             socket.emit('activate-event', { type: 'ad' });
             let cooldown;
             const random = Math.random();
-            if (random < 0.05) { cooldown = 5; } 
-            else if (random < 0.15) { cooldown = 20; } 
-            else if (random < 0.50) { cooldown = 30; } 
-            else { cooldown = 35; }
+            if (random < 0.05) { cooldown = 5; } else if (random < 0.15) { cooldown = 20; } else if (random < 0.50) { cooldown = 30; } else { cooldown = 35; }
             adButton.disabled = true;
             const originalText = adButton.textContent;
             adButton.textContent = `On Cooldown (${cooldown}s)`;
@@ -276,8 +259,7 @@
             const message = messageInput.value.trim();
             if (message) {
                 const isPrivate = chatModeToggle.checked;
-                if (isPrivate) { socket.emit('send-private-message', { message: message }); } 
-                else { socket.emit('send-message', { message: message }); }
+                if (isPrivate) { socket.emit('send-private-message', { message: message }); } else { socket.emit('send-message', { message: message }); }
                 messageInput.value = '';
             }
         });
@@ -294,11 +276,8 @@
             joinScreen.classList.add('hidden');
             controlsScreen.classList.remove('hidden');
         });
-
         socket.on('invalid-room', () => { alert('Invalid Room Code. Please try again.'); });
-        
         socket.on('connect', () => { console.log('Successfully connected to the server!'); });
-        
         socket.on('receive-message', (data) => {
             const { message, sender } = data;
             messageLog.classList.remove('hidden');
@@ -330,7 +309,7 @@
                 if (cooldown <= 0) { clearInterval(sabotageInterval); }
             }, 1000);
         });
-
+        
         socket.on('sabotage-ready', () => {
             clearInterval(sabotageInterval);
             sabotageButton.disabled = false;
