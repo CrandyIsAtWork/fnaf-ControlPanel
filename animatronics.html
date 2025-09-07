@@ -43,15 +43,15 @@
         #message-log li { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; padding-bottom: 5px; border-bottom: 1px dashed #333; word-break: break-all; }
         .message-avatar { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #555; flex-shrink: 0; }
         
-        /* Avatar Carousel Styles */
+        /* NEW: AVATAR CAROUSEL STYLES FOR LARGE IMAGES */
         #avatar-screen { width: 100%; }
-        #avatar-name-display { font-size: 2em; color: #ffdc00; height: 40px; }
+        #avatar-name-display { font-size: 2em; color: #ffdc00; height: 40px; margin-bottom: 10px; }
         #avatar-carousel-wrapper { display: flex; align-items: center; justify-content: space-between; width: 100%; }
-        #avatar-carousel { width: 200px; height: 200px; overflow: hidden; position: relative; }
-        #avatar-strip { display: flex; align-items: center; height: 100%; position: absolute; left: 50%; top: 0; transform: translateX(-100px); transition: transform 0.5s ease; }
-        .carousel-avatar { width: 160px; height: 160px; margin: 20px 10px; border: 5px solid #555; transition: all 0.5s ease; opacity: 0.5; transform: scale(0.8); cursor: pointer; }
+        #avatar-carousel { width: 300px; height: 300px; overflow: hidden; position: relative; }
+        #avatar-strip { display: flex; align-items: center; height: 100%; position: absolute; left: 50%; top: 0; transform: translateX(-150px); transition: transform 0.4s ease-out; }
+        .carousel-avatar { width: 250px; height: 250px; object-fit: cover; margin: 25px 15px; border: 5px solid #555; transition: all 0.4s ease-out; opacity: 0.4; transform: scale(0.6); cursor: pointer; }
         .carousel-avatar.active { border-color: #ffdc00; opacity: 1; transform: scale(1); }
-        .nav-button { font-size: 3em; border: none; background: none; color: #fff; padding: 0 20px; }
+        .nav-button { font-size: 3em; border: none; background: none; color: #fff; padding: 0 10px; }
     </style>
 </head>
 <body>
@@ -78,7 +78,7 @@
 
     <div id="avatar-screen" class="container hidden">
         <h1>Choose Your Animatronic</h1>
-        <h2 id="avatar-name-display">Freddy Fazbear</h2>
+        <h2 id="avatar-name-display">Freddy</h2>
         <div id="avatar-carousel-wrapper">
             <button id="prev-avatar" class="nav-button">◄</button>
             <div id="avatar-carousel">
@@ -115,27 +115,27 @@
     <script>
         const socket = io('https://8b503b84-132c-4149-bdb3-8bef57ec4fd8-00-2ga0ewjtdd2yk.worf.replit.dev');
 
-        // --- DATA ---
+        // --- DATA WITH CORRECT NAMES ---
         const avatars = [
-            { name: 'Freddy Fazbear', path: 'avatars/avatar1.jpg' }, { name: 'Bonnie', path: 'avatars/avatar2.jpg' },
+            { name: 'Freddy', path: 'avatars/avatar1.jpg' }, { name: 'Bonnie', path: 'avatars/avatar2.jpg' },
             { name: 'Chica', path: 'avatars/avatar3.jpg' }, { name: 'Foxy', path: 'avatars/avatar4.jpg' },
-            { name: 'Golden Freddy', path: 'avatars/avatar5.jpg' }, { name: 'The Puppet', path: 'avatars/avatar6.jpg' },
-            { name: 'Toy Freddy', path: 'avatars/avatar7.jpg' }, { name: 'Toy Bonnie', path: 'avatars/avatar8.jpg' },
-            { name: 'Toy Chica', path: 'avatars/avatar9.jpg' }, { name: 'Mangle', path: 'avatars/avatar10.jpg' },
-            { name: 'Balloon Boy', path: 'avatars/avatar11.jpg' }, { name: 'Withered Freddy', path: 'avatars/avatar12.jpg' },
-            { name: 'Withered Bonnie', path: 'avatars/avatar13.jpg' }, { name: 'Withered Chica', path: 'avatars/avatar14.jpg' },
-            { name: 'Withered Foxy', path: 'avatars/avatar15.jpg' }, { name: 'Shadow Freddy', path: 'avatars/avatar16.jpg' },
-            { name: 'Shadow Bonnie', path: 'avatars/avatar17.jpg' }, { name: 'Springtrap', path: 'avatars/avatar18.jpg' },
-            { name: 'Phantom Freddy', path: 'avatars/avatar19.jpg' }, { name: 'Phantom Chica', path: 'avatars/avatar20.jpg' },
-            { name: 'Phantom Foxy', path: 'avatars/avatar21.jpg' }, { name: 'Phantom Mangle', path: 'avatars/avatar22.jpg' },
-            { name: 'Phantom Puppet', path: 'avatars/avatar23.jpg' }, { name: 'Nightmare Freddy', path: 'avatars/avatar24.jpg' },
-            { name: 'Nightmare Bonnie', path: 'avatars/avatar25.jpg' }, { name: 'Nightmare Chica', path: 'avatars/avatar26.jpg' },
-            { name: 'Nightmare Foxy', path: 'avatars/avatar27.jpg' }, { name: 'Nightmare Fredbear', path: 'avatars/avatar28.jpg' },
-            { name: 'Nightmare', path: 'avatars/avatar29.jpg' }, { name: 'Plushtrap', path: 'avatars/avatar30.jpg' },
-            { name: 'Circus Baby', path: 'avatars/avatar31.jpg' }, { name: 'Ballora', path: 'avatars/avatar32.jpg' },
-            { name: 'Funtime Freddy', path: 'avatars/avatar33.jpg' }, { name: 'Funtime Foxy', path: 'avatars/avatar34.jpg' },
-            { name: 'Ennard', path: 'avatars/avatar35.jpg' }, { name: 'Scrap Baby', path: 'avatars/avatar36.jpg' },
-            { name: 'Molten Freddy', path: 'avatars/avatar37.jpg' }, { name: 'Lefty', path: 'avatars/avatar38.jpg' }
+            { name: 'Spring Trap', path: 'avatars/avatar5.jpg' }, { name: 'Toy Freddy', path: 'avatars/avatar6.jpg' },
+            { name: 'Toy Bonnie', path: 'avatars/avatar7.jpg' }, { name: 'Toy Chica', path: 'avatars/avatar8.jpg' },
+            { name: 'Mangle', path: 'avatars/avatar9.jpg' }, { name: 'Balloon Boy', path: 'avatars/avatar10.jpg' },
+            { name: 'The Puppet', path: 'avatars/avatar11.jpg' }, { name: 'JJ', path: 'avatars/avatar12.jpg' },
+            { name: 'Golden Freddy', path: 'avatars/avatar13.jpg' }, { name: 'Phantom Freddy', path: 'avatars/avatar14.jpg' },
+            { name: 'Phantom BB', path: 'avatars/avatar15.jpg' }, { name: 'Withered Bonnie', path: 'avatars/avatar16.jpg' },
+            { name: 'Nightmare Freddy', path: 'avatars/avatar17.jpg' }, { name: 'Nightmare', path: 'avatars/avatar18.jpg' },
+            { name: 'Nightmare Bonnie', path: 'avatars/avatar19.jpg' }, { name: 'Jack-O-Chica', path: 'avatars/avatar20.jpg' },
+            { name: 'Nightmare Fredbear', path: 'avatars/avatar21.jpg' }, { name: 'Nightmare BB', path: 'avatars/avatar22.jpg' },
+            { name: 'Rockstar Freddy', path: 'avatars/avatar23.jpg' }, { name: 'Rockstar Bonnie', path: 'avatars/avatar24.jpg' },
+            { name: 'Rockstar Chica', path: 'avatars/avatar25.jpg' }, { name: 'Rockstar Foxy', path: 'avatars/avatar26.jpg' },
+            { name: 'Mr. Hippo', path: 'avatars/avatar27.jpg' }, { name: 'Happy Frog', path: 'avatars/avatar28.jpg' },
+            { name: 'Pig Patch', path: 'avatars/avatar29.jpg' }, { name: 'Orville', path: 'avatars/avatar30.jpg' },
+            { name: 'Trash and the Gang', path: 'avatars/avatar31.jpg' }, { name: 'Lefty', path: 'avatars/avatar32.jpg' },
+            { name: 'Phone Guy', path: 'avatars/avatar33.jpg' }, { name: 'Old Man Consequences', path: 'avatars/avatar34.jpg' },
+            { name: 'Nightmarionne', path: 'avatars/avatar35.jpg' }, { name: 'Ghostface', path: 'avatars/avatar36.jpg' },
+            { name: 'Viper Ghostface', path: 'avatars/avatar37.jpg' }, { name: 'Michael Myers', path: 'avatars/avatar38.jpg' }
         ];
 
         // --- STATE ---
@@ -186,8 +186,8 @@
         }
 
         function updateCarousel() {
-            const offset = -currentAvatarIndex * 180;
-            avatarStrip.style.transform = `translateX(calc(-100px + ${offset}px))`;
+            const offset = -currentAvatarIndex * 280; // Image width (250) + margin (30)
+            avatarStrip.style.transform = `translateX(calc(-125px + ${offset}px))`; // Starts half of one image over
             avatarNameDisplay.textContent = avatars[currentAvatarIndex].name;
             document.querySelectorAll('.carousel-avatar').forEach(img => {
                 img.classList.remove('active');
