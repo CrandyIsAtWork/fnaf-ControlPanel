@@ -9,7 +9,8 @@
         /* General Body Styles */
         html, body { height: 100%; margin: 0; padding: 0; }
         body { font-family: 'VT323', monospace; background-color: #1a1a1a; color: white; text-align: center; user-select: none; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px; box-sizing: border-box; }
-        .container { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 420px; }
+        .container { display: flex; flex-direction: column; align-items: center; width: 100%; }
+        .screen-constrained { max-width: 420px; }
         h1 { color: #ff4500; font-size: 2.5em; text-shadow: 2px 2px #000; margin: 0 0 15px 0; }
         h2 { color: #ccc; font-size: 1.5em; margin: 15px 0 5px 0; }
         .hidden { display: none !important; }
@@ -43,20 +44,20 @@
         #message-log li { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; padding-bottom: 5px; border-bottom: 1px dashed #333; word-break: break-all; }
         .message-avatar { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #555; flex-shrink: 0; }
         
-        /* NEW: LARGER, STABLE AVATAR CAROUSEL STYLES */
-        #avatar-screen { width: 100%; max-width: 500px; /* Give it a max width */ }
-        #avatar-name-display { font-size: 2.2em; color: #ffdc00; height: 40px; margin-bottom: 10px; }
+        /* WIDER & STABLE AVATAR CAROUSEL STYLES */
+        #avatar-screen { width: 100%; max-width: 800px; }
+        #avatar-name-display { font-size: 2.5em; color: #ffdc00; height: 40px; margin-bottom: 15px; }
         #avatar-carousel-wrapper { display: flex; align-items: center; justify-content: center; width: 100%; }
-        #avatar-carousel { width: 400px; height: 350px; overflow: hidden; position: relative; }
-        #avatar-strip { display: flex; align-items: center; height: 100%; position: absolute; transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1); /* Smoother transition */ }
-        .carousel-avatar { width: 300px; height: 300px; object-fit: cover; margin: 25px 20px; border: 5px solid #555; transition: all 0.5s ease; opacity: 0.3; transform: scale(0.5); cursor: pointer; }
+        #avatar-carousel { width: 90vw; max-width: 700px; height: 350px; overflow: hidden; position: relative; }
+        #avatar-strip { display: flex; align-items: center; height: 100%; position: absolute; left: 0; top: 0; transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1); }
+        .carousel-avatar { width: 300px; height: 300px; object-fit: cover; margin: 25px 20px; border: 5px solid #555; transition: all 0.5s ease; opacity: 0.3; transform: scale(0.6); cursor: pointer; }
         .carousel-avatar.active { border-color: #ffdc00; opacity: 1; transform: scale(1); }
-        .nav-button { font-size: 3em; border: none; background: none; color: #fff; padding: 0 10px; }
+        .nav-button { font-size: 4em; border: none; background: none; color: #fff; padding: 0 20px; z-index: 10; }
     </style>
 </head>
 <body>
 
-    <div id="join-screen" class="container">
+    <div id="join-screen" class="container screen-constrained">
         <h1>Animatronic Setup</h1>
         <input type="text" id="player-name-input" placeholder="Enter Your Name" maxlength="12">
         <h2>Choose Your Color</h2>
@@ -90,7 +91,7 @@
         <button id="confirm-avatar-button">Select This Animatronic</button>
     </div>
 
-    <div id="controls-screen" class="container hidden">
+    <div id="controls-screen" class="container screen-constrained hidden">
         <h1 id="room-title">Room: ABCD</h1>
         <div class="controls-buttons">
             <button id="ad-button">Activate Annoying Ad</button>
@@ -182,13 +183,11 @@
             updateCarousel();
         }
 
-        // NEW, MORE STABLE CALCULATION
         function updateCarousel() {
+            const avatarCarousel = document.getElementById('avatar-carousel');
             const itemWidth = 300 + 40; // Image width (300) + total margin (40)
-            const containerWidth = 400; // Width of #avatar-carousel
-            
-            const initialOffset = (containerWidth - 300) / 2;
-            const offset = initialOffset - (currentAvatarIndex * itemWidth);
+            const containerWidth = avatarCarousel.offsetWidth;
+            const offset = (containerWidth / 2) - (itemWidth / 2) - (currentAvatarIndex * itemWidth);
 
             avatarStrip.style.transform = `translateX(${offset}px)`;
             avatarNameDisplay.textContent = avatars[currentAvatarIndex].name;
@@ -294,9 +293,12 @@
             roomTitle.textContent = `Room: ${data.roomCode}`;
             joinScreen.classList.add('hidden');
             controlsScreen.classList.remove('hidden');
-});
+        });
+
         socket.on('invalid-room', () => { alert('Invalid Room Code. Please try again.'); });
+        
         socket.on('connect', () => { console.log('Successfully connected to the server!'); });
+        
         socket.on('receive-message', (data) => {
             const { message, sender } = data;
             messageLog.classList.remove('hidden');
@@ -335,7 +337,6 @@
             sabotageButton.textContent = 'Sabotage Task (60s)';
         });
         
-        // --- INITIALIZATION ---
         populateAvatars();
     </script>
 </body>
