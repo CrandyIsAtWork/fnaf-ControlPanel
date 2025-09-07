@@ -57,83 +57,21 @@
         }
 
         /* PERK INFO MODAL STYLES */
-        #perk-info-button {
-            display: inline-block;
-            width: 30px;
-            height: 30px;
-            padding: 0;
-            margin: 0 0 0 15px;
-            font-size: 20px;
-            line-height: 28px;
-            text-align: center;
-            color: #000;
-            background-color: #ffdc00;
-            border: 2px solid #fff;
-            border-radius: 50%;
-            cursor: pointer;
-            vertical-align: middle;
-        }
+        #perk-info-button { display: inline-block; width: 30px; height: 30px; padding: 0; margin: 0 0 0 15px; font-size: 20px; line-height: 28px; text-align: center; color: #000; background-color: #ffdc00; border: 2px solid #fff; border-radius: 50%; cursor: pointer; vertical-align: middle; }
+        #perk-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); display: flex; justify-content: center; align-items: center; z-index: 1000; }
+        #perk-modal-content { position: relative; background-color: #0a0a0a; border: 4px solid #ffdc00; padding: 25px; width: 90%; max-width: 500px; text-align: left; color: #fff; text-shadow: 1px 1px #000; }
+        #perk-modal-close { position: absolute; top: -15px; right: -15px; width: 35px; height: 35px; background: red; color: white; border: 2px solid white; border-radius: 50%; font-size: 20px; padding: 0; margin: 0; }
+        #modal-avatar-name { font-size: 2.2em; color: #ff4500; margin: 0; }
+        #modal-perk-name { font-size: 1.5em; color: #ffdc00; margin: 5px 0 15px 0; border-bottom: 2px dashed #555; padding-bottom: 10px; }
+        #modal-perk-description { font-size: 1.2em; color: #eee; margin: 0; line-height: 1.4; }
 
-        #perk-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        #perk-modal-content {
-            position: relative;
-            background-color: #0a0a0a;
-            border: 4px solid #ffdc00;
-            padding: 25px;
-            width: 90%;
-            max-width: 500px;
-            text-align: left;
-            color: #fff;
-            text-shadow: 1px 1px #000;
-        }
-
-        #perk-modal-close {
-            position: absolute;
-            top: -15px;
-            right: -15px;
-            width: 35px;
-            height: 35px;
-            background: red;
-            color: white;
-            border: 2px solid white;
-            border-radius: 50%;
-            font-size: 20px;
-            padding: 0;
-            margin: 0;
-        }
-
-        #modal-avatar-name {
-            font-size: 2.2em;
-            color: #ff4500;
-            margin: 0;
-        }
-
-        #modal-perk-name {
-            font-size: 1.5em;
-            color: #ffdc00;
-            margin: 5px 0 15px 0;
-            border-bottom: 2px dashed #555;
-            padding-bottom: 10px;
-        }
-
-        #modal-perk-description {
-            font-size: 1.2em;
-            color: #eee;
-            margin: 0;
-            line-height: 1.4;
-        }
+        /* GHOSTFACE ABILITY STYLES */
+        #ghostface-ability-container { width: 90%; max-width: 400px; border: 2px solid #ff4136; padding: 10px; margin-bottom: 15px; }
+        #task-target-container { display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; }
+        .target-btn { width: 45%; padding: 8px; font-size: 1.2em; margin: 2px; }
+        #marked-progress-container { margin-top: 10px; }
+        #marked-progress-bar-outer { width: 100%; background-color: #0a0a0a; border: 2px solid #555; height: 20px; }
+        #marked-progress-bar-inner { width: 0%; height: 100%; background-color: #ff4136; transition: width 0.2s linear; }
     </style>
 </head>
 <body>
@@ -173,6 +111,24 @@
 
     <div id="controls-screen" class="container screen-constrained hidden">
         <h1 id="room-title">Room: ABCD</h1>
+
+        <div id="ghostface-ability-container" class="hidden">
+            <h2>Mark for Death (60s)</h2>
+            <button id="mark-for-death-btn" class="ability-btn">Activate Ability</button>
+            <div id="task-target-container" class="hidden">
+                <button class="target-btn" data-target="task-1">Mark Task 1</button>
+                <button class="target-btn" data-target="task-2">Mark Task 2</button>
+                <button class="target-btn" data-target="task-3">Mark Task 3</button>
+                <button class="target-btn" data-target="task-4">Mark Task 4</button>
+            </div>
+            <div id="marked-progress-container" class="hidden">
+                <h3>Marked Task Progress:</h3>
+                <div id="marked-progress-bar-outer">
+                    <div id="marked-progress-bar-inner"></div>
+                </div>
+            </div>
+        </div>
+
         <div class="controls-buttons">
             <button id="ad-button">Activate Annoying Ad (30s)</button>
             <button id="sabotage-button" class="ability-btn">Sabotage Task (60s)</button>
@@ -277,6 +233,12 @@
         const modalAvatarName = document.getElementById('modal-avatar-name');
         const modalPerkName = document.getElementById('modal-perk-name');
         const modalPerkDescription = document.getElementById('modal-perk-description');
+        const ghostfaceContainer = document.getElementById('ghostface-ability-container');
+        const markForDeathBtn = document.getElementById('mark-for-death-btn');
+        const taskTargetContainer = document.getElementById('task-target-container');
+        const targetBtns = document.querySelectorAll('.target-btn');
+        const markedProgressContainer = document.getElementById('marked-progress-container');
+        const markedProgressBarInner = document.getElementById('marked-progress-bar-inner');
         
         const cooldownIntervals = {};
         const originalButtonText = {
@@ -392,10 +354,37 @@
             }
         });
 
+        markForDeathBtn.addEventListener('click', () => {
+            taskTargetContainer.classList.remove('hidden');
+        });
+
+        targetBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetTaskId = btn.dataset.target;
+                socket.emit('use-special-ability', { ability: 'markForDeath', target: targetTaskId });
+                taskTargetContainer.classList.add('hidden');
+                markForDeathBtn.disabled = true;
+                markForDeathBtn.textContent = "Mark for Death (60s)";
+                let cooldown = 60;
+                const interval = setInterval(() => {
+                    cooldown--;
+                    markForDeathBtn.textContent = `Mark for Death (${cooldown}s)`;
+                    if (cooldown <= 0) {
+                        clearInterval(interval);
+                        markForDeathBtn.disabled = false;
+                        markForDeathBtn.textContent = "Mark for Death (60s)";
+                    }
+                }, 1000);
+            });
+        });
+
         socket.on('join-successful', (data) => {
             roomTitle.textContent = `Room: ${data.roomCode}`;
             joinScreen.classList.add('hidden');
             controlsScreen.classList.remove('hidden');
+            if (selectedAvatar && selectedAvatar.includes('avatar36.jpg')) {
+                ghostfaceContainer.classList.remove('hidden');
+            }
         });
         socket.on('invalid-room', () => { alert('Invalid Room Code. Please try again.'); });
         socket.on('connect', () => { console.log('Successfully connected to the server!'); });
@@ -447,6 +436,11 @@
             clearInterval(cooldownIntervals[ability]);
             button.disabled = false;
             button.textContent = originalButtonText[ability];
+        });
+
+        socket.on('marked-task-progress', (data) => {
+            markedProgressContainer.classList.remove('hidden');
+            markedProgressBarInner.style.width = `${data.progress}%`;
         });
         
         populateAvatars();
