@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Animatronic Control Panel</title>
   <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/1245/1245741.png">
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
@@ -22,17 +22,16 @@
       padding: 10px;
       box-sizing: border-box;
     }
-    .container { display: flex; flex-direction: column; align-items: center; width: 100%; }
-    .screen-constrained { max-width: 420px; }
-    h1 { color: #ff4500; font-size: 2.5em; text-shadow: 2px 2px #000; margin: 0 0 15px 0; }
-    h2 { color: #ccc; font-size: 1.5em; margin: 15px 0 5px 0; }
+    .container { display:flex; flex-direction:column; align-items:center; width:100%; }
+    .screen-constrained { max-width: 860px; width:100%; }
+    h1 { color:#ff4500; font-size:2.2em; margin:8px 0 12px 0; text-shadow:2px 2px #000; }
+    h2 { color:#ccc; font-size:1.2em; margin:10px 0; }
     .hidden { display: none !important; }
-
     input[type="text"] {
       font-family: 'VT323', monospace;
-      font-size: 1.5em;
+      font-size: 1.2em;
       width: 90%;
-      max-width: 400px;
+      max-width: 420px;
       padding: 10px;
       margin-bottom: 10px;
       background-color: #0a0a0a;
@@ -40,130 +39,173 @@
       color: white;
       text-align: center;
     }
-
     button {
       width: 90%;
-      max-width: 400px;
+      max-width: 420px;
       margin: 8px 0;
-      padding: 15px;
+      padding: 12px;
       font-family: 'VT323', monospace;
-      font-size: 1.8em;
+      font-size: 1.1em;
       cursor: pointer;
       border: 3px solid #ff4500;
       background-color: transparent;
       color: #ff4500;
-      transition: all 0.2s ease;
+      transition: all 0.15s ease;
     }
     button:hover:not(:disabled) { background-color: #ff4500; color: #fff; }
-    button:disabled { border-color: #555; color: #555; cursor: not-allowed; }
+    button:disabled { border-color: #555; color: #555; cursor: not-allowed; opacity:0.9; }
 
     /* Colors and avatars */
-    .selection-group { display: flex; justify-content: center; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; }
-    .color-swatch { width: 40px; height: 40px; cursor: pointer; border: 4px solid #444; }
-    .color-swatch.selected { border-color: #fff; }
-    #avatar-selection-area { display: flex; align-items: center; justify-content: center; gap: 20px; width: 100%; }
-    #show-avatar-screen-button { width: 60%; margin: 8px 0; }
-    #selected-avatar-preview { width: 80px; height: 80px; border: 4px solid #fff; visibility: hidden; object-fit: cover; }
+    .selection-group { display:flex; justify-content:center; gap:15px; margin-bottom:12px; flex-wrap:wrap; }
+    .color-swatch { width:40px; height:40px; cursor:pointer; border:4px solid #444; }
+    .color-swatch.selected { border-color:#fff; }
+    #avatar-selection-area { display:flex; align-items:center; justify-content:center; gap:20px; width:100%; }
+    #show-avatar-screen-button { width:60%; margin:8px 0; }
+    #selected-avatar-preview { width:80px; height:80px; border:4px solid #fff; visibility:hidden; object-fit:cover; }
 
     /* Chat & messages */
-    .controls-buttons { display: flex; flex-direction: column; align-items: center; width: 100%; }
-    .sound-btn { border-color: #7a00ff; color: #7a00ff; }
-    .ability-btn { border-color: #ff00de; color: #ff00de; }
+    .controls-buttons { display:flex; flex-direction:column; align-items:center; width:100%; }
+    .sound-btn { border-color:#7a00ff; color:#7a00ff; width: 45%; }
+    .ability-btn { border-color:#ff00de; color:#ff00de; width: 45%; }
     #message-log {
-      width: 90%; max-width: 400px; height: 120px;
+      width: 90%; max-width: 420px; height: 140px;
       background-color: #0a0a0a; border: 3px solid #555;
-      margin-top: 20px; padding: 10px;
-      list-style: none; overflow-y: auto; text-align: left;
-      font-size: 1.1em; box-sizing: border-box;
+      margin-top: 10px; padding: 10px;
+      list-style:none; overflow-y:auto; text-align:left;
+      font-size:1.0em; box-sizing:border-box;
     }
-    #message-log li { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; padding-bottom: 5px; border-bottom: 1px dashed #333; }
-    .message-avatar { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #555; flex-shrink: 0; }
+    #message-log li { display:flex; align-items:center; gap:8px; margin-bottom:6px; padding-bottom:6px; border-bottom:1px dashed #333; }
+    .message-avatar { width:28px; height:28px; border-radius:50%; border:2px solid #555; flex-shrink:0; }
 
     /* Avatar carousel */
-    #avatar-screen { width: 100%; }
-    #avatar-name-display { font-size: 2em; color: #ffdc00; margin-bottom: 10px; }
-    #avatar-carousel { width: 90vw; height: 250px; overflow: hidden; position: relative; }
-    #avatar-strip { display: flex; height: 100%; position: absolute; left: 0; top: 0; transition: transform 0.5s; }
-    .carousel-avatar { width: 200px; height: 200px; object-fit: cover; margin: 25px 15px; border: 5px solid #555; opacity: 0.3; transform: scale(0.6); cursor: pointer; transition: all 0.5s ease; }
-    .carousel-avatar.active { border-color: #ffdc00; opacity: 1; transform: scale(1); }
-    .nav-button { font-size: 3em; border: none; background: none; color: #fff; }
+    #avatar-screen { width:100%; display:flex; flex-direction:column; align-items:center; gap:10px; }
+    #avatar-name-display { font-size:1.6em; color:#ffdc00; height:28px; margin-bottom:8px; display:flex; align-items:center; gap:8px; justify-content:center;}
+    #avatar-carousel-wrapper { display:flex; align-items:center; gap:8px; width:100%; justify-content:center; }
+    .nav-button { font-size:2.5em; border:none; background:none; color:#fff; cursor:pointer; user-select:none; width:48px; }
+    #avatar-carousel { width: calc(100% - 120px); max-width:720px; height: 220px; overflow:hidden; position:relative; }
+    #avatar-strip { display:flex; align-items:center; height:100%; position:absolute; left:0; top:0; transition: transform 0.45s cubic-bezier(.2,.8,.2,1); padding:0 10px; }
+    .carousel-avatar { width:160px; height:160px; object-fit:cover; margin: 20px 8px; border:6px solid #555; opacity:0.35; transform:scale(0.65); cursor:pointer; transition: all 0.35s ease; box-sizing:border-box; background:#111; display:block; }
+    .carousel-avatar.active { border-color:#ffdc00; opacity:1; transform:scale(1); box-shadow: 0 6px 18px rgba(0,0,0,0.6); }
+    @media(min-width:900px) {
+      .carousel-avatar { width:200px; height:200px; margin: 20px 12px; }
+      #avatar-carousel { height: 300px; }
+    }
 
     /* Perk modal */
-    #perk-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 1000; }
-    #perk-modal-content { background-color: #0a0a0a; border: 4px solid #ffdc00; padding: 25px; max-width: 500px; color: #fff; }
-    #perk-modal-close { position: absolute; top: -15px; right: -15px; width: 35px; height: 35px; background: red; color: white; border-radius: 50%; }
+    #perk-modal { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); display:flex; justify-content:center; align-items:center; z-index:2000; }
+    #perk-modal-content { position:relative; background-color:#0a0a0a; border:4px solid #ffdc00; padding:22px; max-width:680px; width:90%; color:#fff; text-align:left; }
+    #perk-modal-close { position:absolute; top:-14px; right:-14px; width:34px; height:34px; background:red; color:#fff; border-radius:50%; border:2px solid #fff; cursor:pointer; }
 
     /* Ghostface */
-    #ghostface-ability-container { width: 90%; max-width: 400px; border: 2px solid #ff4136; padding: 10px; margin-bottom: 15px; }
+    #ghostface-ability-container { width:90%; max-width:420px; border:2px solid #ff4136; padding:10px; margin-bottom:12px; }
 
     /* Myers */
-    #myers-controls { width:90%; max-width:420px; margin:10px auto; border:2px dashed #555; padding:10px; }
-    #myers-feed { width:100%; height:auto; background:#000; }
+    #myers-controls { width:90%; max-width:720px; margin:10px auto; border:2px dashed #555; padding:12px; display:flex; flex-direction:column; gap:8px; align-items:center; }
+    #myers-feed { width:100%; height:auto; background:#000; border:3px solid #222; }
+    #myers-status { color:#ccc; margin:0; }
+
+    /* small helpers */
+    .two-col { display:flex; gap:8px; width:100%; justify-content:center; }
+    .two-col > * { flex:1; max-width: calc(50% - 8px); }
   </style>
 </head>
 <body>
-
-  <!-- Join screen -->
+  <!-- JOIN -->
   <div id="join-screen" class="container screen-constrained">
     <h1>Animatronic Setup</h1>
-    <input type="text" id="player-name-input" placeholder="Enter Your Name" maxlength="12">
+    <input id="player-name-input" type="text" placeholder="Enter Your Name" maxlength="12" />
     <h2>Choose Your Color</h2>
-    <div class="selection-group" id="color-selector">
+    <div id="color-selector" class="selection-group">
       <div class="color-swatch" data-color="#ff4136" style="background:#ff4136;"></div>
       <div class="color-swatch" data-color="#0074d9" style="background:#0074d9;"></div>
       <div class="color-swatch" data-color="#2ecc40" style="background:#2ecc40;"></div>
       <div class="color-swatch" data-color="#ffdc00" style="background:#ffdc00;"></div>
       <div class="color-swatch" data-color="#b10dc9" style="background:#b10dc9;"></div>
     </div>
+
     <h2>Choose Your Avatar</h2>
     <div id="avatar-selection-area">
       <button id="show-avatar-screen-button">Select Avatar</button>
-      <img id="selected-avatar-preview">
+      <img id="selected-avatar-preview" src="" alt="avatar preview" />
     </div>
-    <input type="text" id="room-code-input" placeholder="Enter Room Code" maxlength="4">
+
+    <input id="room-code-input" type="text" placeholder="Enter Room Code" maxlength="4" />
     <button id="join-button">Join Game</button>
   </div>
 
-  <!-- Avatar selection -->
-  <div id="avatar-screen" class="container hidden">
+  <!-- AVATAR SCREEN -->
+  <div id="avatar-screen" class="container screen-constrained hidden">
     <h1>Choose Your Animatronic</h1>
-    <h2 id="avatar-name-display">Freddy <button id="perk-info-button">i</button></h2>
-    <div id="avatar-carousel"><div id="avatar-strip"></div></div>
-    <button id="confirm-avatar-button">Select This Animatronic</button>
-  </div>
+    <div id="avatar-name-display">Freddy <button id="perk-info-button" title="Show perk info">i</button></div>
 
-  <!-- Controls -->
-  <div id="controls-screen" class="container screen-constrained hidden">
-    <h1 id="room-title">Room: ABCD</h1>
-
-    <!-- Ghostface ability -->
-    <div id="ghostface-ability-container" class="hidden">
-      <h2>Mark for Death</h2>
-      <button id="mark-for-death-btn" class="ability-btn">Activate Ability</button>
+    <div id="avatar-carousel-wrapper">
+      <button id="prev-avatar" class="nav-button" aria-label="previous">◄</button>
+      <div id="avatar-carousel">
+        <div id="avatar-strip"></div>
+      </div>
+      <button id="next-avatar" class="nav-button" aria-label="next">►</button>
     </div>
 
-    <!-- Myers ability -->
+    <div style="width:100%; display:flex; justify-content:center; margin-top:8px;">
+      <button id="confirm-avatar-button" style="width:60%;">Select This Animatronic</button>
+    </div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div id="controls-screen" class="container screen-constrained hidden">
+    <h1 id="room-title">Room: ----</h1>
+
+    <div id="ghostface-ability-container" class="hidden">
+      <h2>Mark for Death</h2>
+      <div class="two-col">
+        <button id="mark-for-death-btn" class="ability-btn">Activate Ability</button>
+        <button id="mark-cancel-btn" style="border-color:#777;color:#777">Cancel</button>
+      </div>
+      <div id="task-target-container" class="hidden" style="margin-top:8px; display:flex; gap:6px; flex-wrap:wrap; justify-content:center;">
+        <button class="target-btn" data-target="task-1">Task 1</button>
+        <button class="target-btn" data-target="task-2">Task 2</button>
+        <button class="target-btn" data-target="task-3">Task 3</button>
+        <button class="target-btn" data-target="task-4">Task 4</button>
+      </div>
+      <div id="marked-progress-container" class="hidden" style="margin-top:8px;">
+        <h3 style="margin:6px 0 4px 0;">Marked Task Progress:</h3>
+        <div id="marked-progress-bar-outer" style="width:100%; background:#0a0a0a; border:2px solid #555; height:18px;">
+          <div id="marked-progress-bar-inner" style="width:0%; height:100%; background:#ff4136;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MYERS -->
     <div id="myers-controls" class="hidden">
       <h2>Michael Myers — Stalk</h2>
-      <button id="myers-stalk-btn" class="ability-btn">Stalk Guard</button>
+      <div style="width:100%; display:flex; gap:8px; justify-content:center;">
+        <button id="myers-stalk-btn" class="ability-btn">Stalk Guard</button>
+        <button id="myers-stop-btn" style="border-color:#777;color:#777">Stop</button>
+      </div>
       <p id="myers-status">Stalk ready.</p>
       <video id="myers-feed" autoplay playsinline></video>
     </div>
 
-    <!-- General abilities -->
-    <div class="controls-buttons">
-      <button id="ad-button">Annoying Ad</button>
-      <button id="sabotage-button">Sabotage Task</button>
-      <button id="glitch-button">System Glitch</button>
-      <input type="text" id="message-input" placeholder="Type a message..." maxlength="50">
-      <button id="send-button">Send Message</button>
-      <button class="sound-btn" data-sound="laugh">Freddy's Laugh</button>
+    <!-- Abilities -->
+    <div class="controls-buttons" style="gap:8px;">
+      <div style="width:100%; display:flex; gap:8px; justify-content:center; flex-wrap:wrap;">
+        <button id="ad-button" class="ability-btn">Annoying Ad</button>
+        <button id="sabotage-button" class="ability-btn">Sabotage Task</button>
+        <button id="glitch-button" class="ability-btn">System Glitch</button>
+      </div>
+
+      <input id="message-input" type="text" placeholder="Type a message..." maxlength="100" />
+      <div style="width:100%; display:flex; gap:8px; justify-content:center;">
+        <button id="send-button">Send Message</button>
+        <button class="sound-btn" data-sound="laugh">Freddy's Laugh</button>
+      </div>
+
     </div>
 
     <ul id="message-log" class="hidden"></ul>
   </div>
 
-  <!-- Perk modal -->
+  <!-- PERK MODAL -->
   <div id="perk-modal" class="hidden">
     <div id="perk-modal-content">
       <button id="perk-modal-close">X</button>
@@ -175,79 +217,496 @@
 
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
   <script>
-  const socket = io();
+    // ======= SOCKET SETUP =======
+    // Change the URL if needed; using relative origin is fine if server serves socket.io
+    const socket = io();
 
-  // --- Join screen elements ---
-  const joinScreen = document.getElementById('join-screen');
-  const avatarScreen = document.getElementById('avatar-screen');
-  const controlsScreen = document.getElementById('controls-screen');
-  const showAvatarScreenButton = document.getElementById('show-avatar-screen-button');
-  const confirmAvatarButton = document.getElementById('confirm-avatar-button');
-  const joinButton = document.getElementById('join-button');
-  const roomTitle = document.getElementById('room-title');
+    // ======= AVATARS (38) =======
+    // Each entry: { name, path, perkName, perkDescription }
+    const avatars = [
+      { name: 'Freddy', path: 'avatars/avatar1.jpg', perkName: "Fazbear's Anthem", perkDescription: 'Every time you play "Freddy\'s Laugh", 25% chance the Guard\'s current task time increases by 2s.' },
+      { name: 'Bonnie', path: 'avatars/avatar2.jpg', perkName: "Jam Session", perkDescription: 'When you play any sound, 20% chance to pause Guard task for 3s.' },
+      { name: 'Chica', path: 'avatars/avatar3.jpg', perkName: "Running Buttons", perkDescription: 'When Sabotage Task used, Guard task buttons run away for 10s.' },
+      { name: 'Foxy', path: 'avatars/avatar4.jpg', perkName: "Pirate\'s Haste", perkDescription: 'All ability cooldowns are 10% shorter.' },
+      { name: 'Springtrap', path: 'avatars/avatar5.jpg', perkName: "Agonized Remnant", perkDescription: 'System Glitch generates triple error pop-ups.' },
+      { name: 'Toy Freddy', path: 'avatars/avatar6.jpg', perkName: "Aggressive AI", perkDescription: 'Each Guard completed task reduces your cooldowns by 20%.' },
+      { name: 'Toy Bonnie', path: 'avatars/avatar7.jpg', perkName: "Digital Eyes", perkDescription: '50% chance your face flashes in Annoying Ad delaying close.' },
+      { name: 'Toy Chica', path: 'avatars/avatar8.jpg', perkName: "Cupcake\'s Revenge", perkDescription: 'System Glitch adds one cupcake pop-up that runs from mouse.' },
+      { name: 'Mangle', path: 'avatars/avatar9.jpg', perkName: "Signal Jam", perkDescription: 'Unique ability: jam Guard feed for 5s. (20s CD)' },
+      { name: 'Balloon Boy', path: 'avatars/avatar10.jpg', perkName: "Pesky Distraction", perkDescription: 'Annoying Ad has 50% chance to stop Guard task.' },
+      { name: 'The Puppet', path: 'avatars/avatar11.jpg', perkName: "Music Box", perkDescription: 'Adds a music box Guard must wind; if fail, you can revert a task.' },
+      { name: 'JJ', path: 'avatars/avatar12.jpg', perkName: "Hide and Seek", perkDescription: 'Annoying Ad may hide the mouse cursor for 3s.' },
+      { name: 'Golden Freddy', path: 'avatars/avatar13.jpg', perkName: "IT\'S ME", perkDescription: '3% chance per Guard click to unlock ultimate: reset all tasks.' },
+      { name: 'Phantom Freddy', path: 'avatars/avatar14.jpg', perkName: "Phantom Sabotage", perkDescription: 'Trigger fake GET OUT sabotage (10s CD).' },
+      { name: 'Phantom BB', path: 'avatars/avatar15.jpg', perkName: "Pop-Up Scare", perkDescription: '50% chance to precede Ad with a full-screen jumpscare.' },
+      { name: 'Withered Bonnie', path: 'avatars/avatar16.jpg', perkName: "Unfaced Aggression", perkDescription: 'System Glitch cooldown permanently 20s shorter.' },
+      { name: 'Nightmare Freddy', path: 'avatars/avatar17.jpg', perkName: "Freddle Infestation", perkDescription: "Gain 'Freddle' counters; at 3, Guard's next task +20% time." },
+      { name: 'Nightmare', path: 'avatars/avatar18.jpg', perkName: "Eternal Fright", perkDescription: 'Once per game revert one COMPLETED task to 0% permanently haunted.' },
+      { name: 'Nightmare Bonnie', path: 'avatars/avatar19.jpg', perkName: "Frenzied Attack", perkDescription: 'Sabotage cooldown permanently 15s shorter.' },
+      { name: 'Jack-O-Chica', path: 'avatars/avatar20.jpg', perkName: "Pumpkin Toss", perkDescription: 'Annoying Ad can throw a pumpkin at Guard cursor.' },
+      { name: 'Nightmare Fredbear', path: 'avatars/avatar21.jpg', perkName: "Unforeseen Consequences", perkDescription: '30% chance Sabotage triggers a random secondary event.' },
+      { name: 'Nightmare BB', path: 'avatars/avatar22.jpg', perkName: "Bite Sized", perkDescription: 'Annoying Ad may trigger mini Glitch of drift pop-ups.' },
+      { name: 'Rockstar Freddy', path: 'avatars/avatar23.jpg', perkName: "Please Deposit Five Coins", perkDescription: "Gain 'Faz-Coin' when ability used; 3 coins drains Guard's progress." },
+      { name: 'Rockstar Bonnie', path: 'avatars/avatar24.jpg', perkName: "Power Chord", perkDescription: 'Playing a sound may cause UI to shake and drain progress for 3s.' },
+      { name: 'Rockstar Chica', path: 'avatars/avatar25.jpg', perkName: "Rattle the System", perkDescription: 'When you use System Glitch, OK buttons become slightly harder to click.' },
+      { name: 'Rockstar Foxy', path: 'avatars/avatar26.jpg', perkName: "A Pirate\'s Gamble", perkDescription: '\'Click the Parrot!\' pop-up minigame: success helps Guard, failure sabotages.' },
+      { name: 'Mr. Hippo', path: 'avatars/avatar27.jpg', perkName: "A Lengthy Monologue", perkDescription: 'Once per game force un-skippable 15s monologue preventing guard actions.' },
+      { name: 'Happy Frog', path: 'avatars/avatar28.jpg', perkName: "You\'ll Never See Me Coming!", perkDescription: 'Error pop-ups are invisible for first 2s of System Glitch.' },
+      { name: 'Pig Patch', path: 'avatars/avatar29.jpg', perkName: "Banjo Tune", perkDescription: 'Playing sound may permanently slow Guard mouse speed by 50%.' },
+      { name: 'Orville Elephant', path: 'avatars/avatar30.jpg', perkName: "Vanishing Act", perkDescription: 'Make a Guard task button invisible/nonfunctional for 15s. (60s CD)' },
+      { name: 'Trash and the Gang', path: 'avatars/avatar31.jpg', perkName: "System Clutter", perkDescription: 'System Glitch spawns 3 extra non-functional pop-ups.' },
+      { name: 'Lefty', path: 'avatars/avatar32.jpg', perkName: "Silent Threat", perkDescription: 'Sabotage is silent and locks Guard out of that task until others done.' },
+      { name: 'Phone Guy', path: 'avatars/avatar33.jpg', perkName: "Faulty Training", perkDescription: 'Temporarily remove Guard\'s active task; returns after others complete. (75s CD)' },
+      { name: 'Old Man Consequences', path: 'avatars/avatar34.jpg', perkName: "Drown Your Demons", perkDescription: 'Trigger a fishing minigame; Guard must press C with timing to dismiss. (20s CD)' },
+      { name: 'Nightmarionne', path: 'avatars/avatar35.jpg', perkName: "Ceaseless Dread", perkDescription: 'Tendrils disable buttons when hovered for >2s.' },
+      { name: 'Ghostface', path: 'avatars/avatar36.jpg', perkName: "Marked for Death", perkDescription: 'Mark one task for 30s — progress reduced by 50% and animatronic can watch its progress.' },
+      { name: 'Viper Ghostface', path: 'avatars/avatar37.jpg', perkName: "System Venom", perkDescription: 'Sabotage resets 50% and poisons task causing drain for 20s.' },
+      { name: 'Michael Myers', path: 'avatars/avatar38.jpg', perkName: "Evil Within", perkDescription: 'Stalk the Guard: watch their webcam feed until they power off their terminal. Rank up by watching.' }
+    ];
 
-  // --- Myers stuff (your code) ---
-  const myersControls = document.getElementById('myers-controls');
-  const myersStalkBtn = document.getElementById('myers-stalk-btn');
-  const myersStatus = document.getElementById('myers-status');
-  const myersFeed = document.getElementById('myers-feed');
-  let myersPc = null;
+    // ======= ELEMENTS =======
+    const joinScreen = document.getElementById('join-screen');
+    const avatarScreen = document.getElementById('avatar-screen');
+    const controlsScreen = document.getElementById('controls-screen');
+    const playerNameInput = document.getElementById('player-name-input');
+    const colorSelector = document.getElementById('color-selector');
+    const roomCodeInput = document.getElementById('room-code-input');
+    const joinButton = document.getElementById('join-button');
+    const showAvatarScreenButton = document.getElementById('show-avatar-screen-button');
+    const selectedAvatarPreview = document.getElementById('selected-avatar-preview');
+    const avatarStrip = document.getElementById('avatar-strip');
+    const avatarNameDisplay = document.getElementById('avatar-name-display');
+    const prevAvatarButton = document.getElementById('prev-avatar');
+    const nextAvatarButton = document.getElementById('next-avatar');
+    const confirmAvatarButton = document.getElementById('confirm-avatar-button');
+    const perkInfoButton = document.getElementById('perk-info-button');
+    const perkModal = document.getElementById('perk-modal');
+    const perkModalClose = document.getElementById('perk-modal-close');
+    const modalAvatarName = document.getElementById('modal-avatar-name');
+    const modalPerkName = document.getElementById('modal-perk-name');
+    const modalPerkDescription = document.getElementById('modal-perk-description');
 
-  // Switch to avatar selection
-  showAvatarScreenButton.addEventListener('click', () => {
-    joinScreen.classList.add('hidden');
-    avatarScreen.classList.remove('hidden');
-  });
+    const adButton = document.getElementById('ad-button');
+    const sabotageButton = document.getElementById('sabotage-button');
+    const glitchButton = document.getElementById('glitch-button');
+    const sendButton = document.getElementById('send-button');
+    const messageInput = document.getElementById('message-input');
+    const messageLog = document.getElementById('message-log');
 
-  // Confirm avatar → back to join screen
-  confirmAvatarButton.addEventListener('click', () => {
-    avatarScreen.classList.add('hidden');
-    joinScreen.classList.remove('hidden');
-    // You’d also store which avatar was chosen here
-  });
+    const ghostfaceContainer = document.getElementById('ghostface-ability-container');
+    const markForDeathBtn = document.getElementById('mark-for-death-btn');
+    const markCancelBtn = document.getElementById('mark-cancel-btn');
+    const taskTargetContainer = document.getElementById('task-target-container');
+    const targetBtns = document.querySelectorAll('.target-btn');
+    const markedProgressContainer = document.getElementById('marked-progress-container');
+    const markedProgressBarInner = document.getElementById('marked-progress-bar-inner');
 
-  // Join button → send to server + go to controls screen
-  joinButton.addEventListener('click', () => {
-    const roomCode = document.getElementById('room-code-input').value.trim().toUpperCase();
-    const playerName = document.getElementById('player-name-input').value.trim();
-    if (!roomCode || !playerName) {
-      alert("Please enter your name and room code.");
-      return;
+    const myersControls = document.getElementById('myers-controls');
+    const myersStalkBtn = document.getElementById('myers-stalk-btn');
+    const myersStopBtn = document.getElementById('myers-stop-btn');
+    const myersStatus = document.getElementById('myers-status');
+    const myersFeed = document.getElementById('myers-feed');
+    const perkIButton = document.getElementById('perk-info-button');
+
+    // ======= LOCAL STATE =======
+    let selectedColor = null;
+    let selectedAvatar = null; // path like 'avatars/avatar1.jpg'
+    let playerName = '';
+    let currentAvatarIndex = 0;
+    let cooldownIntervals = {};
+    let originalButtonText = {
+      ad: adButton.textContent,
+      sabotage: sabotageButton.textContent,
+      glitch: glitchButton.textContent,
+      myersWatch: 'Stalk Guard',
+      markForDeath: markForDeathBtn.textContent
+    };
+
+    // WebRTC objects (watcher side = animatronic who is Myers)
+    let myersWatcherPc = null;
+    let myersGuardId = null;
+    let myersVideoModal = null;
+
+    // ======= POPULATE CAROUSEL =======
+    function populateAvatars() {
+      avatarStrip.innerHTML = '';
+      avatars.forEach((av, i) => {
+        const img = document.createElement('img');
+        img.className = 'carousel-avatar';
+        img.dataset.index = i;
+        img.alt = av.name;
+        // Use external absolute path if you host else keep relative
+        img.src = `https://crandyisatwork.github.io/fnaf-terminal/${av.path}`;
+        img.addEventListener('click', () => {
+          currentAvatarIndex = i;
+          updateCarousel();
+        });
+        avatarStrip.appendChild(img);
+      });
+      // initial
+      setTimeout(() => updateCarousel(), 120);
     }
-    socket.emit('join-game', { roomCode, playerName });
-    joinScreen.classList.add('hidden');
-    controlsScreen.classList.remove('hidden');
-    roomTitle.textContent = `Room: ${roomCode}`;
-  });
 
-  // --- Myers ability ---
-  myersStalkBtn.addEventListener('click', () => {
-    socket.emit('use-special-ability', { ability: 'myersWatch' });
-    myersStatus.textContent = "Stalking… waiting for stream.";
-  });
-
-  socket.on('myers-offer', async (data) => {
-    try {
-      myersPc = new RTCPeerConnection();
-      myersPc.ontrack = (event) => { myersFeed.srcObject = event.streams[0]; };
-      await myersPc.setRemoteDescription(data.offer);
-      const answer = await myersPc.createAnswer();
-      await myersPc.setLocalDescription(answer);
-      socket.emit('myers-answer', { guardId: data.guardId, answer });
-    } catch (err) { console.error(err); }
-  });
-
-  socket.on('myers-ice-candidate', async (data) => {
-    if (myersPc && data.candidate) {
-      await myersPc.addIceCandidate(new RTCIceCandidate(data.candidate));
+    function updateCarousel() {
+      const imgs = Array.from(avatarStrip.querySelectorAll('.carousel-avatar'));
+      if (!imgs.length) return;
+      // compute item width including margin
+      const first = imgs[0];
+      const style = window.getComputedStyle(first);
+      const marginLeft = parseFloat(style.marginLeft || 8);
+      const marginRight = parseFloat(style.marginRight || 8);
+      const itemWidth = first.offsetWidth + marginLeft + marginRight;
+      // center selected
+      const container = document.getElementById('avatar-carousel');
+      const containerWidth = container.clientWidth;
+      const offset = (containerWidth / 2) - (itemWidth / 2) - (currentAvatarIndex * itemWidth);
+      avatarStrip.style.transform = `translateX(${offset}px)`;
+      imgs.forEach(img => img.classList.remove('active'));
+      const active = avatarStrip.querySelector(`.carousel-avatar[data-index="${currentAvatarIndex}"]`);
+      if (active) active.classList.add('active');
+      // update name
+      const av = avatars[currentAvatarIndex];
+      avatarNameDisplay.firstChild && avatarNameDisplay.removeChild(avatarNameDisplay.firstChild);
+      // display name text plus button kept to the right
+      avatarNameDisplay.innerHTML = `${av.name} `;
+      avatarNameDisplay.appendChild(perkIButton);
     }
-  });
 
-  socket.on('myers-watch-stop', () => {
-    if (myersPc) myersPc.close();
-    myersFeed.srcObject = null;
-    myersStatus.textContent = "Stalk ended.";
-  });
-</script>
+    prevAvatarButton.addEventListener('click', () => {
+      currentAvatarIndex = currentAvatarIndex > 0 ? currentAvatarIndex - 1 : avatars.length - 1;
+      updateCarousel();
+    });
+    nextAvatarButton.addEventListener('click', () => {
+      currentAvatarIndex = currentAvatarIndex < avatars.length - 1 ? currentAvatarIndex + 1 : 0;
+      updateCarousel();
+    });
+
+    // show avatar screen
+    showAvatarScreenButton.addEventListener('click', () => {
+      joinScreen.classList.add('hidden');
+      avatarScreen.classList.remove('hidden');
+    });
+
+    // confirm avatar selection
+    confirmAvatarButton.addEventListener('click', () => {
+      selectedAvatar = avatars[currentAvatarIndex].path;
+      selectedAvatarPreview.src = `https://crandyisatwork.github.io/fnaf-terminal/${selectedAvatar}`;
+      selectedAvatarPreview.style.visibility = 'visible';
+      avatarScreen.classList.add('hidden');
+      joinScreen.classList.remove('hidden');
+    });
+
+    // PERK MODAL
+    perkIButton.addEventListener('click', () => {
+      const av = avatars[currentAvatarIndex];
+      modalAvatarName.textContent = av.name;
+      modalPerkName.textContent = av.perkName;
+      modalPerkDescription.textContent = av.perkDescription;
+      perkModal.classList.remove('hidden');
+    });
+    perkModalClose.addEventListener('click', () => perkModal.classList.add('hidden'));
+    perkModal.addEventListener('click', (e) => { if (e.target === perkModal) perkModal.classList.add('hidden'); });
+
+    // color selection
+    colorSelector.addEventListener('click', (e) => {
+      if (!e.target.classList.contains('color-swatch')) return;
+      colorSelector.querySelectorAll('.selected').forEach(s => s.classList.remove('selected'));
+      e.target.classList.add('selected');
+      selectedColor = e.target.dataset.color;
+    });
+
+    // ======= JOIN FLOW =======
+    joinButton.addEventListener('click', () => {
+      playerName = playerNameInput.value.trim();
+      const roomCode = roomCodeInput.value.trim().toUpperCase();
+      if (!playerName || !selectedColor || !selectedAvatar || !roomCode) {
+        alert('Please enter a name, select a color, pick an avatar, and enter a room code.');
+        return;
+      }
+      // send join to server
+      socket.emit('join-game', { roomCode, playerName, playerColor: selectedColor, playerAvatar: selectedAvatar });
+    });
+
+    // ======= CLIENT -> SERVER: abilities =======
+    adButton.addEventListener('click', () => socket.emit('use-ability', { ability: 'ad' }));
+    sabotageButton.addEventListener('click', () => socket.emit('use-ability', { ability: 'sabotage' }));
+    glitchButton.addEventListener('click', () => socket.emit('use-ability', { ability: 'glitch' }));
+    sendButton.addEventListener('click', () => {
+      const m = messageInput.value.trim();
+      if (!m) return;
+      socket.emit('send-message', { message: m });
+      messageInput.value = '';
+    });
+
+    // Ghostface mark ability UI
+    markForDeathBtn.addEventListener('click', () => {
+      // reveal task target buttons
+      taskTargetContainer.classList.remove('hidden');
+    });
+    markCancelBtn.addEventListener('click', () => {
+      taskTargetContainer.classList.add('hidden');
+    });
+    targetBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const t = btn.dataset.target;
+        socket.emit('use-special-ability', { ability: 'markForDeath', target: t });
+        taskTargetContainer.classList.add('hidden');
+        markForDeathBtn.disabled = true;
+        markForDeathBtn.textContent = 'Mark for Death (60s)';
+        // local cooldown display fallback
+        let cd = 60;
+        const id = setInterval(() => {
+          cd--;
+          markForDeathBtn.textContent = `Mark for Death (${cd}s)`;
+          if (cd <= 0) {
+            clearInterval(id);
+            markForDeathBtn.disabled = false;
+            markForDeathBtn.textContent = originalButtonText.markForDeath;
+          }
+        }, 1000);
+      });
+    });
+
+    // ======= SOCKET EVENTS (general) =======
+    socket.on('connect', () => console.log('Connected to server.'));
+    socket.on('invalid-room', () => alert('Invalid room code — try again.'));
+    socket.on('join-successful', (data) => {
+      // server accepted join
+      document.getElementById('room-title').textContent = `Room: ${data.roomCode}`;
+      joinScreen.classList.add('hidden');
+      controlsScreen.classList.remove('hidden');
+
+      // show special UIs based on selected avatar
+      if (selectedAvatar && selectedAvatar.includes('avatar36.jpg')) {
+        // ghostface
+        ghostfaceContainer.classList.remove('hidden');
+      }
+      if (selectedAvatar && selectedAvatar.includes('avatar38.jpg')) {
+        // Michael Myers
+        myersControls.classList.remove('hidden');
+      }
+    });
+
+    socket.on('receive-message', (data) => {
+      const { message, sender } = data;
+      messageLog.classList.remove('hidden');
+      const li = document.createElement('li');
+      const img = document.createElement('img');
+      img.className = 'message-avatar';
+      img.src = `https://crandyisatwork.github.io/fnaf-terminal/${sender.avatar}`;
+      const div = document.createElement('div');
+      const strong = document.createElement('strong');
+      strong.textContent = `${sender.name}: `;
+      strong.style.color = sender.color;
+      div.appendChild(strong);
+      div.appendChild(document.createTextNode(message));
+      li.appendChild(img);
+      li.appendChild(div);
+      messageLog.appendChild(li);
+      if (messageLog.children.length > 12) messageLog.removeChild(messageLog.firstChild);
+      messageLog.scrollTop = messageLog.scrollHeight;
+    });
+
+    // start-cooldown / cooldown-ready
+    socket.on('start-cooldown', (data) => {
+      const { ability, duration } = data;
+      const buttonMap = { ad: adButton, sabotage: sabotageButton, glitch: glitchButton, myersWatch: myersStalkBtn, markForDeath: markForDeathBtn };
+      const btn = buttonMap[ability];
+      if (!btn) return;
+      btn.disabled = true;
+      let cd = Math.ceil(duration / 1000);
+      btn.textContent = `${originalButtonText[ability] ? originalButtonText[ability].split(' (')[0] : btn.textContent} (${cd}s)`;
+      if (cooldownIntervals[ability]) clearInterval(cooldownIntervals[ability]);
+      cooldownIntervals[ability] = setInterval(() => {
+        cd--;
+        btn.textContent = `${originalButtonText[ability] ? originalButtonText[ability].split(' (')[0] : btn.textContent} (${cd}s)`;
+        if (cd <= 0) {
+          clearInterval(cooldownIntervals[ability]);
+        }
+      }, 1000);
+    });
+    socket.on('cooldown-ready', (data) => {
+      const { ability } = data;
+      const buttonMap = { ad: adButton, sabotage: sabotageButton, glitch: glitchButton, myersWatch: myersStalkBtn, markForDeath: markForDeathBtn };
+      const btn = buttonMap[ability];
+      if (!btn) return;
+      if (cooldownIntervals[ability]) clearInterval(cooldownIntervals[ability]);
+      btn.disabled = false;
+      btn.textContent = originalButtonText[ability] || btn.textContent;
+    });
+
+    // Marked progress (Ghostface)
+    socket.on('marked-task-progress', (data) => {
+      markedProgressContainer.classList.remove('hidden');
+      markedProgressBarInner.style.width = `${(data.progress||0)}%`;
+    });
+
+    // task-marked / task-unmarked for UI feedback on Guard - animatronic client may not need but included
+    socket.on('marked-task-progress', () => {}); // handled above
+
+    // ======= MYERS: WATCH (ANIMATRONIC SIDE) =======
+    // Click "Stalk Guard" -> emit use-special-ability('myersWatch'), server will handle cooldown/approval and forward the guard's offer to animatronic(s).
+    myersStalkBtn.addEventListener('click', () => {
+      socket.emit('use-special-ability', { ability: 'myersWatch' });
+      myersStatus.textContent = 'Stalk requested — waiting...';
+    });
+
+    // Provide a way for the animatronic to stop watching voluntarily (local stop)
+    myersStopBtn.addEventListener('click', () => {
+      if (myersWatcherPc) {
+        try { myersWatcherPc.close(); } catch(e) {}
+        myersWatcherPc = null;
+      }
+      if (myersVideoModal && myersVideoModal.parentNode) {
+        myersVideoModal.parentNode.removeChild(myersVideoModal);
+        myersVideoModal = null;
+      }
+      myersFeed.srcObject = null;
+      myersStatus.textContent = 'Stalk stopped by animatronic.';
+      // Optionally notify server that watcher closed, server may already clear watcher when guard off
+    });
+
+    // Helper: create or ensure a video modal for the watcher (bigger view)
+    function ensureMyersVideoModal() {
+      if (myersVideoModal) return myersVideoModal;
+      const modal = document.createElement('div');
+      modal.id = 'myers-video-modal';
+      Object.assign(modal.style, {
+        position: 'fixed', top: '8%', left: '50%', transform: 'translateX(-50%)',
+        zIndex: 4000, background: '#000', border: '4px solid #ff4136', padding: '8px', boxShadow: '0 0 30px rgba(0,0,0,0.8)'
+      });
+      const closeBtn = document.createElement('button');
+      closeBtn.textContent = 'X';
+      Object.assign(closeBtn.style, { position:'absolute', top:'-10px', right:'-10px', width:'34px', height:'34px', background:'red', color:'#fff', border:'2px solid #fff', borderRadius:'50%', cursor:'pointer' });
+      closeBtn.addEventListener('click', () => {
+        if (myersWatcherPc) try { myersWatcherPc.close(); } catch(e) {}
+        myersWatcherPc = null;
+        if (modal.parentNode) modal.parentNode.removeChild(modal);
+        myersVideoModal = null;
+        myersFeed.srcObject = null;
+        myersStatus.textContent = 'Stalk ended.';
+      });
+      const vid = document.createElement('video');
+      vid.autoplay = true;
+      vid.playsInline = true;
+      vid.style.width = '560px';
+      vid.style.height = '420px';
+      vid.style.background = '#111';
+      modal.appendChild(closeBtn);
+      modal.appendChild(vid);
+      document.body.appendChild(modal);
+      myersVideoModal = vid;
+      return vid;
+    }
+
+    // Server forwards the guard's offer to the animatronic watcher(s)
+    // Payload expected: { offer, guardId }
+    socket.on('myers-offer', async (data) => {
+      try {
+        console.log('Received myers-offer', data);
+        if (!data || !data.offer) {
+          console.warn('myers-offer missing offer');
+          return;
+        }
+
+        // Create RTCPeerConnection on animatronic (watcher) side
+        myersWatcherPc = new RTCPeerConnection();
+
+        // When the guard adds tracks, display them
+        myersWatcherPc.ontrack = (event) => {
+          // prefer event.streams[0]
+          const videoEl = ensureMyersVideoModal();
+          if (event.streams && event.streams[0]) {
+            videoEl.srcObject = event.streams[0];
+            // also show in small embedded area
+            try { myersFeed.srcObject = event.streams[0]; } catch (e) {}
+          } else if (event.track) {
+            const ms = new MediaStream();
+            ms.addTrack(event.track);
+            videoEl.srcObject = ms;
+            try { myersFeed.srcObject = ms; } catch (e) {}
+          }
+          myersStatus.textContent = 'Stalking — viewing Guard feed.';
+        };
+
+        // Forward our ICE candidates back to guard (server will relay)
+        myersWatcherPc.onicecandidate = (evt) => {
+          if (evt.candidate && data.guardId) {
+            socket.emit('myers-ice-candidate', { toId: data.guardId, candidate: evt.candidate });
+          }
+        };
+
+        // Set remote description (guard's offer)
+        await myersWatcherPc.setRemoteDescription(new RTCSessionDescription(data.offer));
+
+        // Create answer
+        const answer = await myersWatcherPc.createAnswer();
+        await myersWatcherPc.setLocalDescription(answer);
+
+        // Send answer back to guard via server
+        socket.emit('myers-answer', { guardId: data.guardId, answer: myersWatcherPc.localDescription });
+
+        // store guard id for potential future candidate routing
+        myersGuardId = data.guardId;
+
+      } catch (err) {
+        console.error('Error handling myers-offer (watcher):', err);
+      }
+    });
+
+    // When the guard (or server) forwards ICE candidates to us
+    socket.on('myers-ice-candidate', async (data) => {
+      try {
+        if (!data || !data.candidate) return;
+        if (myersWatcherPc) {
+          await myersWatcherPc.addIceCandidate(new RTCIceCandidate(data.candidate));
+        } else {
+          console.warn('Received ICE candidate but no myersWatcherPc yet.');
+        }
+      } catch (err) {
+        console.warn('Error adding ICE candidate (watcher):', err);
+      }
+    });
+
+    // If server signals stalk ends or cancelled
+    socket.on('myers-watch-stop', () => {
+      if (myersWatcherPc) {
+        try { myersWatcherPc.close(); } catch(e) {}
+        myersWatcherPc = null;
+      }
+      if (myersVideoModal && myersVideoModal.parentNode) {
+        myersVideoModal.parentNode.removeChild(myersVideoModal);
+        myersVideoModal = null;
+      }
+      myersFeed.srcObject = null;
+      myersStatus.textContent = 'Stalk ended.';
+    });
+    socket.on('myers-cancelled', () => {
+      if (myersWatcherPc) {
+        try { myersWatcherPc.close(); } catch(e) {}
+        myersWatcherPc = null;
+      }
+      if (myersVideoModal && myersVideoModal.parentNode) {
+        myersVideoModal.parentNode.removeChild(myersVideoModal);
+        myersVideoModal = null;
+      }
+      myersFeed.srcObject = null;
+      myersStatus.textContent = 'Stalk cancelled.';
+    });
+
+    // ======= UTILITY: populate carousel on load =======
+    populateAvatars();
+
+    // keep carousel responsive
+    window.addEventListener('resize', updateCarousel);
+
+    // enable small keyboard shortcuts for carousel (optional)
+    window.addEventListener('keydown', (e) => {
+      if (avatarScreen.classList.contains('hidden')) return;
+      if (e.key === 'ArrowLeft') prevAvatarButton.click();
+      if (e.key === 'ArrowRight') nextAvatarButton.click();
+      if (e.key === 'Enter') confirmAvatarButton.click();
+    });
+  </script>
 </body>
 </html>
