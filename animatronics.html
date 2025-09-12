@@ -175,42 +175,79 @@
 
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
   <script>
-    const socket = io();
+  const socket = io();
 
-    // --- simplified: only showing Myers-specific bits here ---
-    const myersControls = document.getElementById('myers-controls');
-    const myersStalkBtn = document.getElementById('myers-stalk-btn');
-    const myersStatus = document.getElementById('myers-status');
-    const myersFeed = document.getElementById('myers-feed');
-    let myersPc = null;
+  // --- Join screen elements ---
+  const joinScreen = document.getElementById('join-screen');
+  const avatarScreen = document.getElementById('avatar-screen');
+  const controlsScreen = document.getElementById('controls-screen');
+  const showAvatarScreenButton = document.getElementById('show-avatar-screen-button');
+  const confirmAvatarButton = document.getElementById('confirm-avatar-button');
+  const joinButton = document.getElementById('join-button');
+  const roomTitle = document.getElementById('room-title');
 
-    myersStalkBtn.addEventListener('click', () => {
-      socket.emit('use-special-ability', { ability: 'myersWatch' });
-      myersStatus.textContent = "Stalking… waiting for stream.";
-    });
+  // --- Myers stuff (your code) ---
+  const myersControls = document.getElementById('myers-controls');
+  const myersStalkBtn = document.getElementById('myers-stalk-btn');
+  const myersStatus = document.getElementById('myers-status');
+  const myersFeed = document.getElementById('myers-feed');
+  let myersPc = null;
 
-    socket.on('myers-offer', async (data) => {
-      try {
-        myersPc = new RTCPeerConnection();
-        myersPc.ontrack = (event) => { myersFeed.srcObject = event.streams[0]; };
-        await myersPc.setRemoteDescription(data.offer);
-        const answer = await myersPc.createAnswer();
-        await myersPc.setLocalDescription(answer);
-        socket.emit('myers-answer', { guardId: data.guardId, answer });
-      } catch (err) { console.error(err); }
-    });
+  // Switch to avatar selection
+  showAvatarScreenButton.addEventListener('click', () => {
+    joinScreen.classList.add('hidden');
+    avatarScreen.classList.remove('hidden');
+  });
 
-    socket.on('myers-ice-candidate', async (data) => {
-      if (myersPc && data.candidate) {
-        await myersPc.addIceCandidate(new RTCIceCandidate(data.candidate));
-      }
-    });
+  // Confirm avatar → back to join screen
+  confirmAvatarButton.addEventListener('click', () => {
+    avatarScreen.classList.add('hidden');
+    joinScreen.classList.remove('hidden');
+    // You’d also store which avatar was chosen here
+  });
 
-    socket.on('myers-watch-stop', () => {
-      if (myersPc) myersPc.close();
-      myersFeed.srcObject = null;
-      myersStatus.textContent = "Stalk ended.";
-    });
-  </script>
+  // Join button → send to server + go to controls screen
+  joinButton.addEventListener('click', () => {
+    const roomCode = document.getElementById('room-code-input').value.trim().toUpperCase();
+    const playerName = document.getElementById('player-name-input').value.trim();
+    if (!roomCode || !playerName) {
+      alert("Please enter your name and room code.");
+      return;
+    }
+    socket.emit('join-game', { roomCode, playerName });
+    joinScreen.classList.add('hidden');
+    controlsScreen.classList.remove('hidden');
+    roomTitle.textContent = `Room: ${roomCode}`;
+  });
+
+  // --- Myers ability ---
+  myersStalkBtn.addEventListener('click', () => {
+    socket.emit('use-special-ability', { ability: 'myersWatch' });
+    myersStatus.textContent = "Stalking… waiting for stream.";
+  });
+
+  socket.on('myers-offer', async (data) => {
+    try {
+      myersPc = new RTCPeerConnection();
+      myersPc.ontrack = (event) => { myersFeed.srcObject = event.streams[0]; };
+      await myersPc.setRemoteDescription(data.offer);
+      const answer = await myersPc.createAnswer();
+      await myersPc.setLocalDescription(answer);
+      socket.emit('myers-answer', { guardId: data.guardId, answer });
+    } catch (err) { console.error(err); }
+  });
+
+  socket.on('myers-ice-candidate', async (data) => {
+    if (myersPc && data.candidate) {
+      await myersPc.addIceCandidate(new RTCIceCandidate(data.candidate));
+    }
+  });
+
+  socket.on('myers-watch-stop', () => {
+    if (myersPc) myersPc.close();
+    myersFeed.srcObject = null;
+    myersStatus.textContent = "Stalk ended.";
+  });
+</script>
 </body>
 </html>
