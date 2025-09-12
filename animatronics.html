@@ -389,12 +389,16 @@
 
     // confirm avatar selection
     confirmAvatarButton.addEventListener('click', () => {
-      selectedAvatar = avatars[currentAvatarIndex].path;
-      selectedAvatarPreview.src = `https://crandyisatwork.github.io/fnaf-terminal/${selectedAvatar}`;
-      selectedAvatarPreview.style.visibility = 'visible';
-      avatarScreen.classList.add('hidden');
-      joinScreen.classList.remove('hidden');
-    });
+  // Store just the filename for server checks (e.g. "avatar38.jpg")
+  selectedAvatar = avatars[currentAvatarIndex].path.split('/').pop();
+
+  // But still show the full preview in the UI
+  selectedAvatarPreview.src = `https://crandyisatwork.github.io/fnaf-terminal/avatars/${selectedAvatar}`;
+  selectedAvatarPreview.style.visibility = 'visible';
+
+  avatarScreen.classList.add('hidden');
+  joinScreen.classList.remove('hidden');
+});
 
     // PERK MODAL
     perkIButton.addEventListener('click', () => {
