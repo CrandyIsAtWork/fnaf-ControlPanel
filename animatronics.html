@@ -218,8 +218,10 @@
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
   <script>
     // ======= SOCKET SETUP =======
-    // Change the URL if needed; using relative origin is fine if server serves socket.io
-    const socket = io();
+    const socket = io("https://8b503b84-132c-4149-bdb3-8bef57ec4fd8-00-2ga0ewjtdd2yk.worf.replit.dev", {
+  transports: ["websocket"]
+});
+
 
     // ======= AVATARS (38) =======
     // Each entry: { name, path, perkName, perkDescription }
