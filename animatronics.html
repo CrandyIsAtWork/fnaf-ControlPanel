@@ -40,18 +40,18 @@
       text-align: center;
     }
     button {
-      width: 90%;
-      max-width: 420px;
-      margin: 8px 0;
-      padding: 12px;
-      font-family: 'VT323', monospace;
-      font-size: 1.1em;
-      cursor: pointer;
-      border: 3px solid #ff4500;
-      background-color: transparent;
-      color: #ff4500;
-      transition: all 0.15s ease;
-    }
+  width: 90%;
+  max-width: 420px;
+  margin: 8px 0;
+  padding: calc(12px * var(--btn-scale));
+  font-family: 'VT323', monospace;
+  font-size: calc(1.1em * var(--btn-scale));
+  cursor: pointer;
+  border: 3px solid #ff4500;
+  background-color: transparent;
+  color: #ff4500;
+  transition: all 0.15s ease;
+}
     button:hover:not(:disabled) { background-color: #ff4500; color: #fff; }
     button:disabled { border-color: #555; color: #555; cursor: not-allowed; opacity:0.9; }
 
@@ -197,7 +197,33 @@
       <input id="message-input" type="text" placeholder="Type a message..." maxlength="100" />
       <div style="width:100%; display:flex; gap:8px; justify-content:center;">
         <button id="send-button">Send Message</button>
-        <button class="sound-btn" data-sound="laugh">Freddy's Laugh</button>
+        <button id="play-sound-btn" class="sound-btn">Play Sound</button>
+<div id="sound-menu" class="hidden" style="margin-top:8px;">
+  <select id="sound-select">
+    <option value="laugh.mp3">Freddy's Laugh</option>
+    <option value="bonk.mp3">Bonk</option>
+    <option value="scream.mp3">Scream</option>
+    <script>
+    const playSoundBtn = document.getElementById('play-sound-btn');
+const soundMenu = document.getElementById('sound-menu');
+const soundSelect = document.getElementById('sound-select');
+const sendSoundBtn = document.getElementById('send-sound-btn');
+
+playSoundBtn.addEventListener('click', () => {
+  soundMenu.classList.toggle('hidden');
+});
+
+sendSoundBtn.addEventListener('click', () => {
+  const soundFile = soundSelect.value;
+  socket.emit('play-sound', { file: `https://raw.githubusercontent.com/CrandyIsAtWork/fnaf-terminal/main/sounds/${soundFile}` });
+  soundMenu.classList.add('hidden');
+});
+    </script>
+
+  </select>
+  <button id="send-sound-btn">Send</button>
+</div>
+
       </div>
 
     </div>
@@ -217,6 +243,14 @@
 
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
   <script>
+    // Detect if device is mobile
+const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+if (isMobile) {
+  document.documentElement.style.setProperty('--btn-scale', '1.4'); // make buttons bigger
+} else {
+  document.documentElement.style.setProperty('--btn-scale', '1');
+}
+
     // ======= SOCKET SETUP =======
     const socket = io("https://8b503b84-132c-4149-bdb3-8bef57ec4fd8-00-2ga0ewjtdd2yk.worf.replit.dev", {
   transports: ["websocket"]
