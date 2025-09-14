@@ -422,16 +422,21 @@
     });
 
     // ======= JOIN FLOW =======
-    joinButton.addEventListener('click', () => {
-      playerName = playerNameInput.value.trim();
-      const roomCode = roomCodeInput.value.trim().toUpperCase();
-      if (!playerName || !selectedColor || !selectedAvatar || !roomCode) {
-        alert('Please enter a name, select a color, pick an avatar, and enter a room code.');
-        return;
-      }
-      // send join to server
-      socket.emit('join-game', { roomCode, playerName, playerColor: selectedColor, playerAvatar: selectedAvatar });
-    });
+joinButton.addEventListener('click', () => {
+  playerName = playerNameInput.value.trim();
+  const roomCode = roomCodeInput.value.trim().toUpperCase();
+  if (!playerName || !selectedColor || !selectedAvatar || !roomCode) {
+    alert('Please enter a name, select a color, pick an avatar, and enter a room code.');
+    return;
+  }
+
+  // disable button to prevent spam
+  joinButton.disabled = true;
+  joinButton.textContent = "Joining...";
+
+  // send join to server
+  socket.emit('join-game', { roomCode, playerName, playerColor: selectedColor, playerAvatar: selectedAvatar });
+});
 
     // ======= CLIENT -> SERVER: abilities =======
     adButton.addEventListener('click', () => socket.emit('use-ability', { ability: 'ad' }));
@@ -475,7 +480,12 @@
 
     // ======= SOCKET EVENTS (general) =======
     socket.on('connect', () => console.log('Connected to server.'));
-    socket.on('invalid-room', () => alert('Invalid room code — try again.'));
+    socket.on('invalid-room', () => {
+  alert('Invalid room code — try again.');
+  // re-enable join button so they can retry
+  joinButton.disabled = false;
+  joinButton.textContent = "Join Game";
+});
     socket.on('join-successful', (data) => {
       // server accepted join
       document.getElementById('room-title').textContent = `Room: ${data.roomCode}`;
